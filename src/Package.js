@@ -109,7 +109,7 @@ class Package {
         const outputPath = path.join(process.cwd(), 'deployments', ...pkgParts);
         try {
             console.log('Removing temporary folder.');
-            await fs.rmdir(path.join(process.cwd(), '.tmp'), {
+            await fs.rmdir(path.join(process.cwd(), '.formio-tmp'), {
                 recursive: true
             });
         }
@@ -119,9 +119,9 @@ class Package {
             await fs.unlink(outputPath);
         }
         catch (err) { }
-        let pkgPath = this.path.split('/');
-        const pkgName = pkgPath.pop();
-        pkgPath = pkgPath.join('.');
+        let pkgPaths = this.path.split('/');
+        const pkgName = pkgPaths.pop();
+        const pkgPath = pkgPaths.join('.');
         let pkg = _.get(this.options.packages, pkgPath, {})[pkgName];
         if (pkg) {
             pkg = this.package(pkg);
@@ -130,45 +130,46 @@ class Package {
             const nginx = templates.nginx(pkg, this.options);
 
             console.log('Creating temporary folder.');
-            await fs.mkdir(path.join(process.cwd(), '.tmp'));
+            await fs.mkdir(path.join(process.cwd(), '.formio-tmp'));
 
             // Add NGINX
             if (!pkg.local) {
                 console.log('Adding NGINX configuration.');
-                await fs.mkdir(path.join(process.cwd(), '.tmp', 'conf.d'), {recursive: true});
-                await fs.writeFile(path.join(process.cwd(), '.tmp', 'conf.d', 'default.conf'), nginx);
+                await fs.mkdir(path.join(process.cwd(), '.formio-tmp', 'conf.d'), {recursive: true});
+                await fs.writeFile(path.join(process.cwd(), '.formio-tmp', 'conf.d', 'default.conf'), nginx);
             }
 
             // If we have a mongo cert, copy it over.
             if (pkg.mongoCert) {
                 console.log(`Copying MongoDB Certificate: ${pkg.mongoCert}`);
-                await fs.mkdir(path.join(process.cwd(), '.tmp', 'certs'), {recursive: true});
-                await fs.copyFile(path.join(__dirname, 'certs', pkg.mongoCert), path.join(process.cwd(), '.tmp', 'certs', pkg.mongoCert));
+                await fs.mkdir(path.join(process.cwd(), '.formio-tmp', 'certs'), {recursive: true});
+                await fs.copyFile(path.join(__dirname, 'certs', pkg.mongoCert), path.join(process.cwd(), '.formio-tmp', 'certs', pkg.mongoCert));
             }
 
             // If they provided their own certs, copy them over.
             if (this.options.sslCert) {
                 console.log(`Copying certificate: ${this.options.sslCert}`);
-                await fs.mkdir(path.join(process.cwd(), '.tmp', 'certs'), {recursive: true});
-                await fs.copyFile(path.join(this.pathOrLocal(this.options.sslCert), 'utf8'), path.join(process.cwd(), '.tmp', 'certs', 'cert.crt'));
+                await fs.mkdir(path.join(process.cwd(), '.formio-tmp', 'certs'), {recursive: true});
+                await fs.copyFile(path.join(this.pathOrLocal(this.options.sslCert), 'utf8'), path.join(process.cwd(), '.formio-tmp', 'certs', 'cert.crt'));
             }
             if (this.options.sslKey) {
                 console.log(`Copying certificate key: ${this.options.sslKey}`);
-                await fs.mkdir(path.join(process.cwd(), '.tmp', 'certs'), {recursive: true});
-                await fs.copyFile(path.join(this.pathOrLocal(this.options.sslKey), 'utf8'), path.join(process.cwd(), '.tmp', 'certs', 'cert.key'));
+                await fs.mkdir(path.join(process.cwd(), '.formio-tmp', 'certs'), {recursive: true});
+                await fs.copyFile(path.join(this.pathOrLocal(this.options.sslKey), 'utf8'), path.join(process.cwd(), '.formio-tmp', 'certs', 'cert.key'));
             }
 
             // Add manifest file.
             console.log(`Creating manifest.`);
             switch (type) {
                 case 'compose':
-                    await fs.writeFile(path.join(process.cwd(), '.tmp', 'docker-compose.yml'), manifest);
+                    await fs.writeFile(path.join(process.cwd(), '.formio-tmp', 'docker-compose.yml'), manifest);
                     break;
             }
 
             // Create the package.
             console.log(`Creating package ${outputPath}.`);
-            zipper.sync.zip(path.join(process.cwd(), '.tmp/')).compress().save(outputPath);
+            await fs.mkdir(path.join(process.cwd(), ...pkgPaths), {recursive: true});
+            zipper.sync.zip(path.join(process.cwd(), '.formio-tmp/')).compress().save(outputPath);
         }
         else {
             console.log('Package not found.');

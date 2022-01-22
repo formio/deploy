@@ -71,11 +71,11 @@ class Package {
         this.options = options.default ? options : Package.defaultOptions(options);
     }
 
-    pathOrLocal(path) {
-        if (path[0] === '/') {
-            return path;
+    pathOrLocal(filePath) {
+        if (filePath[0] === '/') {
+            return filePath;
         }
-        return path.join(process.cwd(), path);
+        return path.join(process.cwd(), ...filePath.split('/'));
     }
 
     async package(pkg) {
@@ -94,10 +94,10 @@ class Package {
             pkg.portal = true;
         }
         if (this.options.sslCert) {
-            pkg.sslCert = await fs.readFile(this.pathOrLocal(this.options.sslCert), 'utf8');
+            pkg.sslCert = await fs.readFile(this.pathOrLocal(this.options.sslCert));
         }
         if (this.options.sslKey) {
-            pkg.sslCert = await fs.readFile(this.pathOrLocal(this.options.sslKey), 'utf8');
+            pkg.sslCert = await fs.readFile(this.pathOrLocal(this.options.sslKey));
         }
         pkg.package = true;
         return pkg;

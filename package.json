@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Deployment configurations for the Form.io Enterprise Platform",
   "main": "index.js",
+  "bin": {
+    "formio-deploy": "./bin/formio-deploy"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

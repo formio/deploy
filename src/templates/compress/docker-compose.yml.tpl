@@ -9,6 +9,7 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME:
       MONGO_INITDB_ROOT_PASSWORD:
+<% if (package.pdf) { %>
   minio:
     image: minio/minio
     restart: always
@@ -19,6 +20,7 @@ services:
       MINIO_ACCESS_KEY: CHANGEME
       MINIO_SECRET_KEY: CHANGEME
     command: server /data
+<% } %>
 <% } %>
 <% if (package.server) { %>
   api-server:
@@ -35,6 +37,10 @@ services:
 <% if (package.mongoCert) { %>
     volumes:
       - "./certs:/src/certs:ro"
+<% } %>
+<% if (package.local) { %>
+    ports:
+      - "3000:3000"
 <% } %>
     environment:
 <% if (options.license) { %>
@@ -68,8 +74,10 @@ services:
       PORTAL_ENABLED: 1
 <% } %>
       PORT: 3000
+<% if (!package.local) { %>
     env_file:
       - .env
+<% } %>
 <% } %>
 <% if (package.pdf) { %>
   pdf-server:
@@ -82,6 +90,10 @@ services:
 <% if (package.mongoCert) { %>
     volumes:
       - "./certs:/src/certs:ro"
+<% } %>
+<% if (package.local) { %>
+    ports:
+      - "4005:4005"
 <% } %>
     environment:
 <% if (options.license) { %>
@@ -107,9 +119,12 @@ services:
       FORMIO_S3_SECRET: CHANGEME
 <% } %>
       FORMIO_PDF_PORT: 4005
+<% if (!package.local) { %>
     env_file:
       - .env
 <% } %>
+<% } %>
+<% if (!package.local) { %>
   nginx-proxy:
     image: nginx
     restart: always
@@ -127,4 +142,5 @@ services:
 <% } %>
 <% if (package.pdf) { %>
       - pdf-server
+<% } %>
 <% } %>

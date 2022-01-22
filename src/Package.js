@@ -128,34 +128,33 @@ class Package {
             const type = pkgParts[0];
             const manifest = templates[type](pkg, this.options);
             const nginx = templates.nginx(pkg, this.options);
-            try {
-                // Make the directory structure.
-                console.log('Creating temporary folder.');
-                await fs.mkdir(path.join(process.cwd(), '.tmp'));
-                await fs.mkdir(path.join(process.cwd(), '.tmp', 'certs'));
-                await fs.mkdir(path.join(process.cwd(), '.tmp', 'conf.d'));
-            }
-            catch (err) {
-                console.log('Unable to create temporary directories.');
-            }
+
+            console.log('Creating temporary folder.');
+            await fs.mkdir(path.join(process.cwd(), '.tmp'));
 
             // Add NGINX
-            console.log('Adding NGINX configuration.');
-            await fs.writeFile(path.join(process.cwd(), '.tmp', 'conf.d', 'default.conf'), nginx);
+            if (!pkg.local) {
+                console.log('Adding NGINX configuration.');
+                await fs.mkdir(path.join(process.cwd(), '.tmp', 'conf.d'), {recursive: true});
+                await fs.writeFile(path.join(process.cwd(), '.tmp', 'conf.d', 'default.conf'), nginx);
+            }
 
             // If we have a mongo cert, copy it over.
             if (pkg.mongoCert) {
                 console.log(`Copying MongoDB Certificate: ${pkg.mongoCert}`);
+                await fs.mkdir(path.join(process.cwd(), '.tmp', 'certs'), {recursive: true});
                 await fs.copyFile(path.join(__dirname, 'certs', pkg.mongoCert), path.join(process.cwd(), '.tmp', 'certs', pkg.mongoCert));
             }
 
             // If they provided their own certs, copy them over.
             if (this.options.sslCert) {
                 console.log(`Copying certificate: ${this.options.sslCert}`);
+                await fs.mkdir(path.join(process.cwd(), '.tmp', 'certs'), {recursive: true});
                 await fs.copyFile(path.join(this.pathOrLocal(this.options.sslCert), 'utf8'), path.join(process.cwd(), '.tmp', 'certs', 'cert.crt'));
             }
             if (this.options.sslKey) {
                 console.log(`Copying certificate key: ${this.options.sslKey}`);
+                await fs.mkdir(path.join(process.cwd(), '.tmp', 'certs'), {recursive: true});
                 await fs.copyFile(path.join(this.pathOrLocal(this.options.sslKey), 'utf8'), path.join(process.cwd(), '.tmp', 'certs', 'cert.key'));
             }
 

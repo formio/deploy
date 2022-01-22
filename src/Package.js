@@ -78,7 +78,7 @@ class Package {
         return path.join(process.cwd(), path);
     }
 
-    package(pkg) {
+    async package(pkg) {
         if (pkg.package) {
             return pkg;
         }
@@ -94,10 +94,10 @@ class Package {
             pkg.portal = true;
         }
         if (this.options.sslCert) {
-            pkg.sslCert = fs.readFileSync(this.pathOrLocal(this.options.sslCert), 'utf8');
+            pkg.sslCert = await fs.readFile(this.pathOrLocal(this.options.sslCert), 'utf8');
         }
         if (this.options.sslKey) {
-            pkg.sslCert = fs.readFileSync(this.pathOrLocal(this.options.sslKey), 'utf8');
+            pkg.sslCert = await fs.readFile(this.pathOrLocal(this.options.sslKey), 'utf8');
         }
         pkg.package = true;
         return pkg;
@@ -124,7 +124,7 @@ class Package {
         const pkgPath = pkgPaths.join('.');
         let pkg = _.get(this.options.packages, pkgPath, {})[pkgName];
         if (pkg) {
-            pkg = this.package(pkg);
+            pkg = await this.package(pkg);
             const type = pkgParts[0];
             const manifest = templates[type](pkg, this.options);
             const nginx = templates.nginx(pkg, this.options);

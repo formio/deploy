@@ -95,9 +95,11 @@ class Package {
         }
         if (this.options.sslCert) {
             pkg.sslCert = await fs.readFile(this.pathOrLocal(this.options.sslCert));
+            pkg.sslCert = pkg.sslCert.toString().replace(/\n/g, '\\n');
         }
         if (this.options.sslKey) {
-            pkg.sslCert = await fs.readFile(this.pathOrLocal(this.options.sslKey));
+            pkg.sslKey = await fs.readFile(this.pathOrLocal(this.options.sslKey));
+            pkg.sslKey = pkg.sslKey.toString().replace(/\n/g, '\\n');
         }
         pkg.package = true;
         return pkg;
@@ -150,12 +152,12 @@ class Package {
             if (this.options.sslCert) {
                 console.log(`Copying certificate: ${this.options.sslCert}`);
                 await fs.mkdir(path.join(process.cwd(), '.formio-tmp', 'certs'), {recursive: true});
-                await fs.copyFile(path.join(this.pathOrLocal(this.options.sslCert), 'utf8'), path.join(process.cwd(), '.formio-tmp', 'certs', 'cert.crt'));
+                await fs.copyFile(path.join(this.pathOrLocal(this.options.sslCert)), path.join(process.cwd(), '.formio-tmp', 'certs', 'cert.crt'));
             }
             if (this.options.sslKey) {
                 console.log(`Copying certificate key: ${this.options.sslKey}`);
                 await fs.mkdir(path.join(process.cwd(), '.formio-tmp', 'certs'), {recursive: true});
-                await fs.copyFile(path.join(this.pathOrLocal(this.options.sslKey), 'utf8'), path.join(process.cwd(), '.formio-tmp', 'certs', 'cert.key'));
+                await fs.copyFile(path.join(this.pathOrLocal(this.options.sslKey)), path.join(process.cwd(), '.formio-tmp', 'certs', 'cert.key'));
             }
 
             // Add manifest file.

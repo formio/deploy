@@ -168,7 +168,8 @@ class Package {
 
             // Create the package.
             console.log(`Creating package ${outputPath}.`);
-            await fs.mkdir(path.join(process.cwd(), ...pkgPaths), {recursive: true});
+            pkgParts.pop();
+            await fs.mkdir(path.join(process.cwd(), 'deployments', ...pkgParts), {recursive: true});
             zipper.sync.zip(path.join(process.cwd(), '.formio-tmp/')).compress().save(outputPath);
         }
         else {

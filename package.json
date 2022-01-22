@@ -1,13 +1,14 @@
 {
   "name": "@formio/deploy",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Deployment configurations for the Form.io Enterprise Platform",
   "main": "index.js",
   "bin": {
     "formio-deploy": "./bin/formio-deploy"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "package": "node index.js package --license=YOURLICENSE"
   },
   "repository": {
     "type": "git",

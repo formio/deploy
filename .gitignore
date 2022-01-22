@@ -1,4 +1,4 @@
 .DS_Store
 .vscode
-.tmp
+.formio-tmp
 node_modules

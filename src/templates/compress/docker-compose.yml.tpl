@@ -43,6 +43,7 @@ services:
       - "3000:3000"
 <% } %>
     environment:
+<% if (package.local) { %>
 <% if (options.license) { %>
       LICENSE_KEY: <%- options.license %>
 <% } %>
@@ -57,6 +58,7 @@ services:
 <% } %>
 <% if (options.adminPass) { %>
       ADMIN_PASS: <%- options.adminPass %>
+<% } %>
 <% } %>
 <% if (package.mongo) { %>
       MONGO: <%- package.mongo %>
@@ -96,7 +98,7 @@ services:
       - "4005:4005"
 <% } %>
     environment:
-<% if (options.license) { %>
+<% if (package.local && options.license) { %>
       LICENSE_KEY: <%- options.license %>
 <% } %>
 <% if (package.mongo) { %>

@@ -198,7 +198,7 @@ class Package {
 
     async createPackage() {
         console.log(`Creating package ${this.outputPath}.`);
-        await fs.mkdir(path.join(...this.outputPath.split('/').slice(0, -1)), { recursive: true });
+        await fs.mkdir(path.join('/', ...this.outputPath.split('/').slice(0, -1)), { recursive: true });
         zipper.sync.zip(path.join(this.currentDir, '/')).compress().save(this.outputPath);
     }
 

@@ -47,3 +47,16 @@ Options:
   --ssl-key [key]          File path to the SSL Certificate Key for the deployment to enable SSL.
   -h, --help               display help for command
 ```
+
+##### Example
+The following will create a new multi-container deployment package for AWS, with version 7.3.0 Server Version and 3.3.1 PDF Server Version.
+
+```
+formio-deploy package compose/aws/multicontainer.zip --version=7.3.0 --pdf-version=3.3.1
+```
+
+Once this is done, it will generate a new ZIP file within the deployments folder for ```compose/aws/multicontainer.zip``` as well as place the deployment in the ```deployments/current``` folder.  You can now use the ZIP file to deploy to AWS Elastic Beanstalk, or you can run the package on your local machine by typing the following in your terminal.
+
+```
+docker-compose -f ~/deployments/current/docker-compose.yml up
+```

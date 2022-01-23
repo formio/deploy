@@ -2,27 +2,29 @@
     "compose": {
         "aws": {
             "api-server.zip": {
-                "mongoCert": "rds-combined-ca-bundle.pem",
+                "mongoCert": "https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem",
                 "pdf": false
             },
             "pdf-server.zip": {
-                "mongoCert": "rds-combined-ca-bundle.pem",
+                "mongoCert": "https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem",
                 "server": false
             },
             "multicontainer.zip": {
-                "mongoCert": "rds-combined-ca-bundle.pem"
+                "mongoCert": "https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem"
             },
             "multicontainer.gov.zip": {
-                "mongoCert": "rds-combined-ca-us-gov-bundle.pem"
+                "mongoCert": "https://truststore.pki.us-gov-west-1.rds.amazonaws.com/global/global-bundle.pem",
+                "mongoCertName": "rds-combined-ca-us-gov-bundle.pem"
             },
             "multicontainer.gov.ssl.zip": {
-                "mongoCert": "rds-combined-ca-us-gov-bundle.pem",
+                "mongoCert": "https://truststore.pki.us-gov-west-1.rds.amazonaws.com/global/global-bundle.pem",
+                "mongoCertName": "rds-combined-ca-us-gov-bundle.pem",
                 "ssl": true
             },
             "submission-server.zip": {
                 "server": "<%- options.submissionServer %>",
                 "version": "<%- options.subVersion %>",
-                "mongoCert": "rds-combined-ca-bundle.pem",
+                "mongoCert": "https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem",
                 "portal": false,
                 "proxy": true,
                 "pdf": false
@@ -30,7 +32,8 @@
             "submission-server.gov.zip": {
                 "server": "<%- options.submissionServer %>",
                 "version": "<%- options.subVersion %>",
-                "mongoCert": "rds-combined-ca-us-gov-bundle.pem",
+                "mongoCert": "https://truststore.pki.us-gov-west-1.rds.amazonaws.com/global/global-bundle.pem",
+                "mongoCertName": "rds-combined-ca-us-gov-bundle.pem",
                 "portal": false,
                 "proxy": true,
                 "pdf": false

@@ -1,13 +1,28 @@
 const path = require('path');
+const _fs = require('fs');
 const fs = require('fs/promises');
 const zipper = require('zip-local');
 const templates = require('./templates');
 const _ = require('lodash');
 const packages = require('./packages.json');
+const homedir = require('os').homedir();
+const fetch = require('node-fetch');
+
+// See if this is being run locally or not.
+let isLocal = false;
+try {
+    const pkgJson = JSON.parse(_fs.readFileSync(path.join(process.cwd(), 'package.json'), 'utf8'));
+    isLocal = pkgJson.name === '@formio/deploy';
+}
+catch (err) {
+
+}
 
 class Package {
-    static defaultOptions(options) {
-        options = _.defaults(options || {}, {
+    static downloadCache = {};
+    static get defaultOptions() {
+        return {
+            dir: path.join(isLocal ? process.cwd() : homedir, 'deployments'),
             server: 'formio/formio-enterprise',
             version: 'latest',
             pdf: 'formio/pdf-server',
@@ -19,7 +34,11 @@ class Package {
             adminEmail: 'admin@example.com',
             adminPass: 'CHANGEME',
             default: true
-        });
+        };
+    }
+
+    static options(options) {
+        options = _.defaults(options || {}, Package.defaultOptions);
         options.packages = JSON.parse(_.template(JSON.stringify(packages))({ options }));
         return options;
     }
@@ -51,8 +70,7 @@ class Package {
     }
 
     /**
-     * @parm path - The path to the deployment we wish to create.
-     * 
+     * @parm deployment - The path to the deployment we wish to create.
      * @param {*} options - Configurations.
      * @param options.license - The Form.io license
      * @param options.server - The Form.io Enterprise Server Docker repo
@@ -63,12 +81,22 @@ class Package {
      * @param options.jwtSecret - The JWT Secret
      * @param options.adminEmail - The Admin email address
      * @param options.adminPass - The Admin password
-     * @param options.sslCert - File path to the SSL certificate
-     * @param options.sslKey - File path to the SSL certificate key
+     * @param options.sslCert - File path or URL to the SSL certificate
+     * @param options.sslKey - File path or URL to the SSL certificate key
+     * @param options.mongoCert - File path or URL to the MongoDB SSL Certificate.
      */
-    constructor(path, options) {
-        this.path = path;
-        this.options = options.default ? options : Package.defaultOptions(options);
+    constructor(deployment, options) {
+        this.path = deployment;
+        this.options = options.default ? options : Package.options(options);
+        this.pathParts = this.path.split('/');
+        this.type = this.pathParts[0];
+        this.outputPath = path.join(this.options.dir, ...this.pathParts);
+        const pkgName = this.pathParts.pop();
+        const pkgPath = this.pathParts.join('.');
+        this.package = _.get(this.options.packages, pkgPath, {})[pkgName];
+        this.currentDir = path.join(this.options.dir, 'current');
+        this.certsDir = path.join(this.currentDir, 'certs');
+        this.hasCert = false;
     }
 
     pathOrLocal(filePath) {
@@ -78,101 +106,115 @@ class Package {
         return path.join(process.cwd(), ...filePath.split('/'));
     }
 
-    async package(pkg) {
-        if (pkg.package) {
-            return pkg;
+    async fileContents(filePath) {
+        if (filePath.match(/^http[s]?:/)) {
+            if (!Package.downloadCache.hasOwnProperty(filePath)) {
+                console.log(`Downloading file contents ${filePath}`);
+                const resp = await fetch(filePath);
+                Package.downloadCache[filePath] = await resp.text();
+            }
+            return Package.downloadCache[filePath];
         }
-        if (!pkg.hasOwnProperty('server')) {
-            pkg.server = this.options.server;
-            pkg.server += `:${pkg.version || this.options.version}`;
+        else {
+            return await fs.readFile(this.pathOrLocal(filePath));
         }
-        if (!pkg.hasOwnProperty('pdf')) {
-            pkg.pdf = this.options.pdf;
-            pkg.pdf += `:${pkg.pdfVersion || this.options.pdfVersion}`;
+    }
+
+    async fullPackage() {
+        if (this.package.full) {
+            return this.package;
         }
-        if (!pkg.hasOwnProperty('portal')) {
-            pkg.portal = true;
+        if (!this.package.hasOwnProperty('server')) {
+            this.package.server = this.options.server;
+            this.package.server += `:${this.package.version || this.options.version}`;
+        }
+        if (!this.package.hasOwnProperty('pdf')) {
+            this.package.pdf = this.options.pdf;
+            this.package.pdf += `:${this.package.pdfVersion || this.options.pdfVersion}`;
+        }
+        if (!this.package.hasOwnProperty('portal')) {
+            this.package.portal = true;
+        }
+        const mongoCert = this.options.mongoCert || this.package.mongoCert;
+        if (mongoCert) {
+            this.package.mongoCert = mongoCert;
+            this.package.mongoCertName = this.package.mongoCertName || mongoCert.split('/').pop();
         }
         if (this.options.sslCert) {
-            pkg.sslCert = await fs.readFile(this.pathOrLocal(this.options.sslCert));
-            pkg.sslCert = pkg.sslCert.toString().replace(/\n/g, '\\n');
+            this.package.sslCert = await this.fileContents(this.options.sslCert);
+            this.package.sslCert = this.package.sslCert.toString().replace(/\n/g, '\\n');
         }
         if (this.options.sslKey) {
-            pkg.sslKey = await fs.readFile(this.pathOrLocal(this.options.sslKey));
-            pkg.sslKey = pkg.sslKey.toString().replace(/\n/g, '\\n');
+            this.package.sslKey = await this.fileContents(this.options.sslKey);
+            this.package.sslKey = this.package.sslKey.toString().replace(/\n/g, '\\n');
         }
-        pkg.package = true;
-        return pkg;
+        this.package.full = true;
+    }
+
+    async addCert(name, fn) {
+        if (!name) {
+            return;
+        }
+        if (!this.hasCert) {
+            await fs.rmdir(this.certsDir, { recursive: true });
+        }
+        await fs.mkdir(this.certsDir, { recursive: true });
+        console.log(`Creating Certificate: ${name}`)
+        await fn();
+        this.hasCert = true;
+    }
+
+    async addCerts() {
+        await this.addCert(this.package.mongoCertName, async () => await fs.writeFile(path.join(this.certsDir, this.package.mongoCertName), await this.fileContents(this.package.mongoCert)));
+        await this.addCert(this.options.sslCert, async () => await fs.copyFile(path.join(this.pathOrLocal(this.options.sslCert)), path.join(this.certsDir, 'cert.crt')));
+        await this.addCert(this.options.sslKey, async () => await fs.copyFile(path.join(this.pathOrLocal(this.options.sslKey)), path.join(this.certsDir, 'cert.key')));
+        if (!this.hasCert) {
+            // Delete the certs folder.
+            await fs.rmdir(this.certsDir, { recursive: true });
+        }
+    }
+
+    async addNGINX() {
+        if (!this.package.local) {
+            console.log('Adding NGINX configuration.');
+            await fs.mkdir(path.join(this.currentDir, 'conf.d'), { recursive: true });
+            await fs.writeFile(path.join(this.currentDir, 'conf.d', 'default.conf'), templates.nginx(this.package, this.options));
+        }
+        else {
+            // Delete the nginx folder.
+            await fs.rmdir(path.join(this.currentDir, 'conf.d'), { recursive: true });
+        }
+    }
+
+    async addManifest() {
+        console.log(`Creating ${this.type} manifest.`);
+        const manifest = templates[this.type](this.package, this.options);
+        switch (this.type) {
+            case 'compose':
+                await fs.writeFile(path.join(this.currentDir, 'docker-compose.yml'), manifest);
+                break;
+        }
+    }
+
+    async createPackage() {
+        console.log(`Creating package ${this.outputPath}.`);
+        await fs.mkdir(path.join(this.options.dir, ...this.pathParts.slice(0, -1)), { recursive: true });
+        zipper.sync.zip(path.join(this.currentDir, '/')).compress().save(this.outputPath);
     }
 
     async create() {
         console.group(`Creating ${this.path}`);
-        const pkgParts = this.path.split('/');
-        const outputPath = path.join(process.cwd(), 'deployments', ...pkgParts);
-        try {
-            console.log('Removing temporary folder.');
-            await fs.rmdir(path.join(process.cwd(), '.formio-tmp'), {
-                recursive: true
-            });
-        }
-        catch (err) { }
         try {
             console.log('Removing previous package.');
-            await fs.unlink(outputPath);
+            await fs.unlink(this.outputPath);
         }
         catch (err) { }
-        let pkgPaths = this.path.split('/');
-        const pkgName = pkgPaths.pop();
-        const pkgPath = pkgPaths.join('.');
-        let pkg = _.get(this.options.packages, pkgPath, {})[pkgName];
-        if (pkg) {
-            pkg = await this.package(pkg);
-            const type = pkgParts[0];
-            const manifest = templates[type](pkg, this.options);
-            const nginx = templates.nginx(pkg, this.options);
-
-            console.log('Creating temporary folder.');
-            await fs.mkdir(path.join(process.cwd(), '.formio-tmp'));
-
-            // Add NGINX
-            if (!pkg.local) {
-                console.log('Adding NGINX configuration.');
-                await fs.mkdir(path.join(process.cwd(), '.formio-tmp', 'conf.d'), {recursive: true});
-                await fs.writeFile(path.join(process.cwd(), '.formio-tmp', 'conf.d', 'default.conf'), nginx);
-            }
-
-            // If we have a mongo cert, copy it over.
-            if (pkg.mongoCert) {
-                console.log(`Copying MongoDB Certificate: ${pkg.mongoCert}`);
-                await fs.mkdir(path.join(process.cwd(), '.formio-tmp', 'certs'), {recursive: true});
-                await fs.copyFile(path.join(__dirname, 'certs', pkg.mongoCert), path.join(process.cwd(), '.formio-tmp', 'certs', pkg.mongoCert));
-            }
-
-            // If they provided their own certs, copy them over.
-            if (this.options.sslCert) {
-                console.log(`Copying certificate: ${this.options.sslCert}`);
-                await fs.mkdir(path.join(process.cwd(), '.formio-tmp', 'certs'), {recursive: true});
-                await fs.copyFile(path.join(this.pathOrLocal(this.options.sslCert)), path.join(process.cwd(), '.formio-tmp', 'certs', 'cert.crt'));
-            }
-            if (this.options.sslKey) {
-                console.log(`Copying certificate key: ${this.options.sslKey}`);
-                await fs.mkdir(path.join(process.cwd(), '.formio-tmp', 'certs'), {recursive: true});
-                await fs.copyFile(path.join(this.pathOrLocal(this.options.sslKey)), path.join(process.cwd(), '.formio-tmp', 'certs', 'cert.key'));
-            }
-
-            // Add manifest file.
-            console.log(`Creating manifest.`);
-            switch (type) {
-                case 'compose':
-                    await fs.writeFile(path.join(process.cwd(), '.formio-tmp', 'docker-compose.yml'), manifest);
-                    break;
-            }
-
-            // Create the package.
-            console.log(`Creating package ${outputPath}.`);
-            pkgParts.pop();
-            await fs.mkdir(path.join(process.cwd(), 'deployments', ...pkgParts), {recursive: true});
-            zipper.sync.zip(path.join(process.cwd(), '.formio-tmp/')).compress().save(outputPath);
+        if (this.package) {
+            await this.fullPackage();
+            await this.addNGINX();
+            await this.addCerts();
+            await this.addManifest();
+            await this.createPackage();
         }
         else {
             console.log('Package not found.');

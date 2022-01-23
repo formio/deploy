@@ -34,7 +34,7 @@ services:
 <% if (package.pdf) { %>
       - pdf-server
 <% } %>
-<% if (package.mongoCert) { %>
+<% if (package.mongoCertName) { %>
     volumes:
       - "./certs:/src/certs:ro"
 <% } %>
@@ -63,8 +63,8 @@ services:
 <% if (package.mongo) { %>
       MONGO: <%- package.mongo %>
 <% } %>
-<% if (package.mongoCert) { %>
-      MONGO_CA: /src/certs/<%- package.mongoCert %>
+<% if (package.mongoCertName) { %>
+      MONGO_CA: /src/certs/<%- package.mongoCertName %>
 <% } %>
 <% if (package.pdf) { %>
       PDF_SERVER: http://pdf-server:4005
@@ -89,7 +89,7 @@ services:
     links:
       - mongo
       - minio
-<% if (package.mongoCert) { %>
+<% if (package.mongoCertName) { %>
     volumes:
       - "./certs:/src/certs:ro"
 <% } %>
@@ -104,8 +104,8 @@ services:
 <% if (package.mongo) { %>
       MONGO: <%- package.mongo %>
 <% } %>
-<% if (package.mongoCert) { %>
-      MONGO_CA: /src/certs/<%- package.mongoCert %>
+<% if (package.mongoCertName) { %>
+      MONGO_CA: /src/certs/<%- package.mongoCertName %>
 <% } %>
 <% if (package.sslCert) { %>
       SSL_CERT: <%- package.sslCert %>

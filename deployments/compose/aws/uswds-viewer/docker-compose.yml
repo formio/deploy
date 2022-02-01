@@ -1,0 +1,23 @@
+version: "3.8"
+services:
+  pdf-server:
+    image: formio/uswds-viewer:latest
+    restart: always
+    mem_limit: 1024m
+    volumes:
+      - "./certs:/src/certs:ro"
+    environment:
+      MONGO_CA: /src/certs/rds-combined-ca-bundle.pem
+      FORMIO_PDF_PORT: 4005
+    env_file:
+      - .env
+  nginx-proxy:
+    image: nginx
+    restart: always
+    mem_limit: 128m
+    ports:
+      - "80:80"
+    volumes:
+      - "./conf.d:/etc/nginx/conf.d:ro"
+    links:
+      - pdf-server

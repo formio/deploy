@@ -9,6 +9,11 @@
                 "mongoCert": "https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem",
                 "server": false
             },
+            "uswds-viewer.zip": {
+                "pdf": "formio/uswds-viewer",
+                "mongoCert": "https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem",
+                "server": false
+            },
             "multicontainer.zip": {
                 "mongoCert": "https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem"
             },

@@ -126,10 +126,14 @@ class Package {
         }
         if (!this.package.hasOwnProperty('server')) {
             this.package.server = this.options.server;
+        }
+        if (this.package.server && (this.package.version || this.options.version)) {
             this.package.server += `:${this.package.version || this.options.version}`;
         }
         if (!this.package.hasOwnProperty('pdf')) {
             this.package.pdf = this.options.pdf;
+        }
+        if (this.package.pdf && (this.package.pdfVersion || this.options.pdfVersion)) {
             this.package.pdf += `:${this.package.pdfVersion || this.options.pdfVersion}`;
         }
         if (!this.package.hasOwnProperty('portal')) {

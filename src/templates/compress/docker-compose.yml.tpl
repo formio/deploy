@@ -86,9 +86,11 @@ services:
     image: <%- package.pdf %>
     restart: always
     mem_limit: 1024m
+<% if (package.local) { %>
     links:
       - mongo
       - minio
+<% } %>
 <% if (package.mongoCertName) { %>
     volumes:
       - "./certs:/src/certs:ro"

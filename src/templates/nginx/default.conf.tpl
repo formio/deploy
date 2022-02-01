@@ -10,10 +10,13 @@ server {
   ssl_certificate      /src/certs/cert.crt;
   ssl_certificate_key  /src/certs/cert.key;
 <% } else { %>
-  listen 80
+  listen 80;
 <% } %>
+<% if (package.local) { %>
   server_name localhost;
   client_max_body_size 20M;
+<% } %>
+<% if (package.server) { %>
   location / {
     proxy_set_header    Host $host;
     proxy_set_header    X-Real-IP $remote_addr;
@@ -23,9 +26,14 @@ server {
     proxy_read_timeout  300;
     proxy_redirect      https://api-server:3000 https://$host;
   }
+<% } %>
 <% if (package.pdf) { %>
+<% if (package.server) { %>
   location /pdf/ {
     rewrite ^/pdf/(.*)$ /$1 break;
+<% } else { %>
+  location / {
+<% } %>
     proxy_set_header    Host $host;
     proxy_set_header    X-Real-IP $remote_addr;
     proxy_set_header    X-Forwarded-For $proxy_add_x_forwarded_for;

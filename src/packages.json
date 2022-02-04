@@ -12,7 +12,7 @@
             "uswds-viewer.zip": {
                 "pdf": "formio/uswds-viewer",
                 "mongoCert": "https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem",
-                "server": false
+                "pdfVersion": "<%- options.uswdsVersion %>"
             },
             "multicontainer.zip": {
                 "mongoCert": "https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem"
@@ -43,6 +43,11 @@
                 "proxy": true,
                 "pdf": false
             }
+        },
+        "local.zip": {
+            "local": true,
+            "mongo": "mongodb://mongo:27017/formio",
+            "nginx": true
         },
         "multicontainer.zip": {
             "local": true,

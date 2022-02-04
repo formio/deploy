@@ -38,7 +38,7 @@ services:
     volumes:
       - "./certs:/src/certs:ro"
 <% } %>
-<% if (package.local) { %>
+<% if (package.local && !package.nginx) { %>
     ports:
       - "3000:3000"
 <% } %>
@@ -95,7 +95,7 @@ services:
     volumes:
       - "./certs:/src/certs:ro"
 <% } %>
-<% if (package.local) { %>
+<% if (package.local && !package.nginx) { %>
     ports:
       - "4005:4005"
 <% } %>
@@ -128,13 +128,13 @@ services:
       - .env
 <% } %>
 <% } %>
-<% if (!package.local) { %>
+<% if (!package.local || package.nginx) { %>
   nginx-proxy:
     image: nginx
     restart: always
     mem_limit: 128m
     ports:
-      - "80:80"
+      - "<%- options.port %>:80"
     volumes:
 <% if (package.ssl) { %>
       - "./certs:/src/certs:ro"

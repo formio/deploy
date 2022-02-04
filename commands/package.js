@@ -10,6 +10,7 @@ module.exports = (program) => {
         .option('--version [version]', 'The Form.io Enterprise Server version.', defaultOptions.version)
         .option('--pdf [server]', 'The Form.io PDF Server Docker Repo', defaultOptions.pdf)
         .option('--pdf-version [version]', 'The Form.io PDF Server version.', defaultOptions.pdfVersion)
+        .option('--uswds-version [version]', 'The USWDS PDF Server version.', defaultOptions.uswdsVersion)
         .option('--submission-server [option]', 'The Form.io Submission Server Docker Repository', defaultOptions.submissionServer)
         .option('--sub-version [version]', 'The Form.io Submission Server version.', defaultOptions.subVersion)
         .option('--db-secret [secret]', 'The Database Secret.', defaultOptions.dbSecret)
@@ -19,6 +20,7 @@ module.exports = (program) => {
         .option('--mongo-cert [cert]', 'File path or URL to the MongoDB SSL Certificate')
         .option('--ssl-cert [cert]', 'File path or URL to the SSL Certificate for the deployment to enable SSL.')
         .option('--ssl-key [key]', 'File path or URL to the SSL Certificate Key for the deployment to enable SSL.')
+        .option('--port [port]', 'The port to use for NGINX configurations.')
         .action(async (path, options) => {
             if (!path) {
                 // Build all packages.

@@ -27,12 +27,14 @@ services:
     image: <%- package.server %>
     mem_limit: 1024m
     restart: always
+<% if (package.local || package.pdf) { %>
     links:
 <% if (package.local) { %>
       - mongo
 <% } %>
 <% if (package.pdf) { %>
       - pdf-server
+<% } %>
 <% } %>
 <% if (package.mongoCertName) { %>
     volumes:
@@ -140,11 +142,13 @@ services:
       - "./certs:/src/certs:ro"
 <% } %>
       - "./conf.d:/etc/nginx/conf.d:ro"
+<% if (package.server || package.pdf) { %>
     links:
 <% if (package.server) { %>
       - api-server
 <% } %>
 <% if (package.pdf) { %>
       - pdf-server
+<% } %>
 <% } %>
 <% } %>

@@ -90,6 +90,9 @@ class Package {
      * @param options.mongoCert - File path or URL to the MongoDB SSL Certificate.
      */
     constructor(deployment, options) {
+        if (!deployment.match(/\.zip$/)) {
+            deployment = `${deployment}.zip`;
+        }
         this.path = deployment;
         this.options = options.default ? options : Package.options(options);
         this.pathParts = this.path.split('/');
@@ -99,6 +102,7 @@ class Package {
         const pkgPath = this.pathParts.join('.');
         this.package = _.get(this.options.packages, pkgPath, {})[pkgName];
         this.currentDir = path.join(this.options.dir, 'current');
+        this.templateDir = path.join(__dirname, 'templates');
         this.certsDir = path.join(this.currentDir, 'certs');
         this.hasCert = false;
     }
@@ -194,6 +198,17 @@ class Package {
         }
     }
 
+    async addExtensions() {
+        if (this.package.aws) {
+            console.log('Adding AWS extensions');
+            await fsExtra.copy(path.join(this.templateDir, '.platform'), path.join(this.currentDir, '.platform'));
+        }
+        else {
+            // Delete the platform folder.
+            await fs.rmdir(path.join(this.currentDir, '.platform'), { recursive: true });
+        }
+    }
+
     async addManifest() {
         console.log(`Creating ${this.type} manifest.`);
         const manifest = templates[this.type](this.package, this.options);
@@ -245,6 +260,7 @@ class Package {
         if (this.package) {
             await this.fullPackage();
             await this.addNGINX();
+            await this.addExtensions();
             await this.addCerts();
             await this.addManifest();
             await this.createPackage();

@@ -3,28 +3,34 @@
         "aws": {
             "api-server.zip": {
                 "mongoCert": "https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem",
-                "pdf": false
+                "pdf": false,
+                "aws": true
             },
             "pdf-server.zip": {
                 "mongoCert": "https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem",
-                "server": false
+                "server": false,
+                "aws": true
             },
             "uswds-viewer.zip": {
                 "pdf": "formio/uswds-viewer",
                 "mongoCert": "https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem",
-                "pdfVersion": "<%- options.uswdsVersion %>"
+                "pdfVersion": "<%- options.uswdsVersion %>",
+                "aws": true
             },
             "multicontainer.zip": {
-                "mongoCert": "https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem"
+                "mongoCert": "https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem",
+                "aws": true
             },
             "multicontainer.gov.zip": {
                 "mongoCert": "https://truststore.pki.us-gov-west-1.rds.amazonaws.com/global/global-bundle.pem",
-                "mongoCertName": "rds-combined-ca-us-gov-bundle.pem"
+                "mongoCertName": "rds-combined-ca-us-gov-bundle.pem",
+                "aws": true
             },
             "multicontainer.gov.ssl.zip": {
                 "mongoCert": "https://truststore.pki.us-gov-west-1.rds.amazonaws.com/global/global-bundle.pem",
                 "mongoCertName": "rds-combined-ca-us-gov-bundle.pem",
-                "ssl": true
+                "ssl": true,
+                "aws": true
             },
             "submission-server.zip": {
                 "server": "<%- options.submissionServer %>",
@@ -32,7 +38,8 @@
                 "mongoCert": "https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem",
                 "portal": false,
                 "proxy": true,
-                "pdf": false
+                "pdf": false,
+                "aws": true
             },
             "submission-server.gov.zip": {
                 "server": "<%- options.submissionServer %>",
@@ -41,7 +48,8 @@
                 "mongoCertName": "rds-combined-ca-us-gov-bundle.pem",
                 "portal": false,
                 "proxy": true,
-                "pdf": false
+                "pdf": false,
+                "aws": true
             }
         },
         "local.zip": {

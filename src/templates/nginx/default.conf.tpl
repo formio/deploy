@@ -14,8 +14,9 @@ server {
 <% } %>
 <% if (package.local) { %>
   server_name localhost;
-  client_max_body_size 20M;
 <% } %>
+  client_max_body_size 20M;
+  client_body_buffer_size 20M;
 <% if (package.server) { %>
   location / {
     proxy_set_header    Host $host;

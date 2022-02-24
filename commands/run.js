@@ -1,9 +1,12 @@
 const Package = require('../src/Package');
+const shell = require('@travist/async-shell');
 const defaultOptions = Package.defaultOptions;
+const fs = require('fs/promises');
+const path = require('path');
 module.exports = (program) => {
     program
-        .command('package [path]').alias('p')
-        .description('Create a new deployment package.')
+        .command('run').alias('r')
+        .description('Locally run a Form.io Environment.')
         .option('--dir', 'The default directory within your home folder to place the deployments.', defaultOptions.dir)
         .option('--license [LICENSE_KEY]', 'Your deployment license.', defaultOptions.license)
         .option('--server [server]', 'The Form.io Enterprise Server Docker repo', defaultOptions.server)
@@ -21,17 +24,18 @@ module.exports = (program) => {
         .option('--ssl-cert [cert]', 'File path or URL to the SSL Certificate for the deployment to enable SSL.')
         .option('--ssl-key [key]', 'File path or URL to the SSL Certificate Key for the deployment to enable SSL.')
         .option('--port [port]', 'The port to use for NGINX configurations.')
-        .option('--save', 'Save the configuration parameters into a local .env file for future deployments.')
-        .action(async (path, options) => {
-            if (!path) {
-                // Build all packages.
-                await Package.all(options);
-                console.log('Done!');
+        .option('--save')
+        .action(async (options) => {
+            if (options.save) {
+                await fs.writeFile(path.join(options.dir, 'config.json'), JSON.stringify(options, null, 2));
             }
             else {
-                const package = new Package(path, options);
-                await package.create();
-                console.log('Done!');
+                if (await fs.stat(path.join(options.dir, 'config.json'))) {
+                    options = JSON.parse(await fs.readFile(path.join(options.dir, 'config.json'), 'utf8'));
+                }
             }
+            const package = new Package('compose/local.zip', options);
+            await package.create();
+            await shell('docker-compose -f ~/deployments/current/docker-compose.xml up');
         });
 };

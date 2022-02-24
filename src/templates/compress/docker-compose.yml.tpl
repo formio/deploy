@@ -78,7 +78,10 @@ services:
       PORTAL_ENABLED: 1
 <% } %>
       PORT: 3000
-<% if (!package.local) { %>
+<% if (package.local) { %>
+    env_file:
+      - data/.env
+<% } else { %>
     env_file:
       - .env
 <% } %>
@@ -125,7 +128,10 @@ services:
       FORMIO_S3_SECRET: CHANGEME
 <% } %>
       FORMIO_PDF_PORT: 4005
-<% if (!package.local) { %>
+<% if (package.local) { %>
+    env_file:
+      - data/.env
+<% } else { %>
     env_file:
       - .env
 <% } %>

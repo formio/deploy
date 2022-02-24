@@ -213,9 +213,25 @@ class Package {
         console.log(`Creating package ${this.outputPath}.`);
         await fs.mkdir(path.join('/', ...this.outputPath.split('/').slice(0, -1)), { recursive: true });
         zipper.sync.zip(path.join(this.currentDir, '/')).compress().save(this.outputPath);
-        // Move the data folder back.
-        if (dataExists) {
-            await fsExtra.move(path.join(this.options.dir, 'data'), path.join(this.currentDir, 'data'));
+        if (this.options.local) {
+            // Move the data folder back.
+            if (dataExists) {
+                await fsExtra.move(path.join(this.options.dir, 'data'), path.join(this.currentDir, 'data'));
+            }
+            else {
+                await fs.mkdir(path.join(this.currentDir, 'data'), { recursive: true });
+            }
+
+            // Create the .env file.
+            if (this.options.save) {
+                let envFile = '';
+                if (this.options.license) {
+                    envFile += `LICENSE=${this.options.license}\\n`;
+                }
+                if (this.options.dbSecret) {
+                    envFile += `LICENSE=${this.options.license}\\n`;
+                }
+            }
         }
     }
 

@@ -4,6 +4,18 @@ module.exports = (program) => {
         .command('push <source> <destination>').alias('p')
         .description('Push an application to a hosted environment.')
         .action(async (source, destination) => {
+            let downloaded = false;
+            let parts = [];
+            if (source.indexOf('@') > 0) {
+                downloaded = true;
+                parts = source.split('@');
+                const path = (parts[0] === 'formio-app') ? parts[1] : parts.join('/');
+                await shell(`mkdir ${parts[0]}`);
+                await shell(`aws s3 cp s3://formio-app-releases/${path}.tgz .`);
+                await shell(`tar -zxvf ${parts[1]}.tgz -C ./${parts[0]}`);
+                await shell(`rm ${parts[1]}.tgz`);
+                source = `./${parts[0]}`;
+            }
             let cloudfront = '';
             switch (destination) {
                 case 'portal.test-form.io':
@@ -28,6 +40,9 @@ module.exports = (program) => {
             await shell(`aws s3 sync --acl public-read --exclude "node_modules/*" --exclude ".git/*" ${source} s3://${destination}`);
             if (cloudfront) {
                 await shell(`aws cloudfront create-invalidation --distribution-id ${cloudfront} --paths "/*"`)
+            }
+            if (downloaded) {
+                await shell(`rm -rf ./${parts[0]}`);
             }
         });
 };

@@ -18,8 +18,11 @@ module.exports = (program) => {
                 case 'test.formview.io':
                     cloudfront = 'E1GH8TBBTOUUKY';
                     break;
-                case 'apps.form.io/manager':
-                    cloudfront = 'E26X18INJPZZZI';
+                case 'manager.form.io':
+                    cloudfront = 'EHP8U7763VP9D';
+                    break;
+                case 'manager.test-form.io':
+                    cloudfront = 'E1FSS9J2KV6QL4';
                     break;
             }
             await shell(`aws s3 sync --acl public-read --exclude "node_modules/*" --exclude ".git/*" ${source} s3://${destination}`);

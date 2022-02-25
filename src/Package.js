@@ -218,7 +218,7 @@ class Package {
         const manifest = templates[this.type](this.package, this.options);
         switch (this.type) {
             case 'compose':
-                await fs.writeFile(path.join(this.currentDir, 'docker-compose.yml'), manifest);
+                await fs.writeFile(path.join(this.currentDir, 'docker-compose.yml'), manifest, {encoding:'utf8',flag:'w'});
                 break;
         }
     }
@@ -232,7 +232,7 @@ class Package {
         console.log(`Creating package ${this.outputPath}.`);
         await fs.mkdir(path.join('/', ...this.outputPath.split('/').slice(0, -1)), { recursive: true });
         zipper.sync.zip(path.join(this.currentDir, '/')).compress().save(this.outputPath);
-        if (this.options.local) {
+        if (this.package.local) {
             // Move the data folder back.
             if (dataExists) {
                 await fsExtra.move(path.join(this.options.dir, '.tmp_data'), path.join(this.currentDir, 'data'));

@@ -41,8 +41,13 @@ services:
       SNS_LISTENER_PORT: 4444
     ports:
       - "4444:4444"
+<% if (package.local) { %>
+    env_file:
+      - data/.env
+<% } else { %>
     env_file:
       - .env
+<% } %>
 <% } %>
 <% if (package.server) { %>
   api-server:

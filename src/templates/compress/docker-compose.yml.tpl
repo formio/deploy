@@ -22,6 +22,28 @@ services:
     command: server /data
 <% } %>
 <% } %>
+<% if (package.pdfLibs) { %>
+  pdf-libs:
+    image: formio/pdf-libs:latest
+    mem_limit: 256m
+    environment:
+      PORT: 8080
+    env_file:
+      - .env
+  pdf-converter:
+    image: 551091399009.dkr.ecr.us-east-1.amazonaws.com/pdf-converter:latest
+    mem_limit: 1024m
+    links:
+      - pdf-libs
+    environment:
+      PDFLIBS_URL: http://pdf-libs:8080
+      PORT: 4000
+      SNS_LISTENER_PORT: 4444
+    ports:
+      - "4444:4444"
+    env_file:
+      - .env
+<% } %>
 <% if (package.server) { %>
   api-server:
     image: <%- package.server %>
@@ -96,6 +118,10 @@ services:
       - mongo
       - minio
 <% } %>
+<% if (package.pdfLibs) { %>
+      - pdf-libs
+      - pdf-converter
+<% } %>
 <% if (package.mongoCertName) { %>
     volumes:
       - "./certs:/src/certs:ro"
@@ -119,6 +145,10 @@ services:
 <% } %>
 <% if (package.sslKey) { %>
       SSL_KEY: <%- package.sslKey %>
+<% } %>
+<% if (package.pdfLibs) { %>
+      PDF2FORMIO_URL: http://pdf-converter:4000
+      PDFLIBS_URL: http://pdf-libs:8080
 <% } %>
 <% if (package.local) { %>
       FORMIO_S3_SERVER: minio

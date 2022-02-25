@@ -8,6 +8,7 @@ const _ = require('lodash');
 const packages = require('./packages.json');
 const homedir = require('os').homedir();
 const fetch = require('node-fetch');
+const semver = require('semver');
 
 // See if this is being run locally or not.
 let isLocal = false;
@@ -101,6 +102,9 @@ class Package {
         const pkgName = this.pathParts.pop();
         const pkgPath = this.pathParts.join('.');
         this.package = _.get(this.options.packages, pkgPath, {})[pkgName];
+        if (semver.gt(this.options.pdfVersion, '4.0.0-rc.1')) {
+            this.package.pdfLibs = true;
+        }
         this.currentDir = path.join(this.options.dir, 'current');
         this.templateDir = path.join(__dirname, 'templates');
         this.certsDir = path.join(this.currentDir, 'certs');

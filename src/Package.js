@@ -227,7 +227,7 @@ class Package {
         const dataExists = await fsExtra.pathExists(path.join(this.currentDir, 'data'));
         // Move the data folder out of the current directory.
         if (dataExists) {
-            await fsExtra.move(path.join(this.currentDir, 'data'), path.join(this.options.dir, 'data'));
+            await fsExtra.move(path.join(this.currentDir, 'data'), path.join(this.options.dir, '.tmp_data'));
         }
         console.log(`Creating package ${this.outputPath}.`);
         await fs.mkdir(path.join('/', ...this.outputPath.split('/').slice(0, -1)), { recursive: true });
@@ -235,7 +235,7 @@ class Package {
         if (this.options.local) {
             // Move the data folder back.
             if (dataExists) {
-                await fsExtra.move(path.join(this.options.dir, 'data'), path.join(this.currentDir, 'data'));
+                await fsExtra.move(path.join(this.options.dir, '.tmp_data'), path.join(this.currentDir, 'data'));
             }
             else {
                 await fs.mkdir(path.join(this.currentDir, 'data'), { recursive: true });

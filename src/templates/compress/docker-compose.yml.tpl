@@ -28,8 +28,13 @@ services:
     mem_limit: 256m
     environment:
       PORT: 8080
+<% if (package.local) { %>
+    env_file:
+      - data/.env
+<% } else { %>
     env_file:
       - .env
+<% } %>
   pdf-converter:
     image: 551091399009.dkr.ecr.us-east-1.amazonaws.com/pdf-converter:latest
     mem_limit: 1024m

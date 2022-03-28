@@ -1,6 +1,6 @@
 {
   "name": "@formio/deploy",
-  "version": "1.18.0",
+  "version": "1.19.0",
   "description": "Deployment configurations for the Form.io Enterprise Platform",
   "main": "index.js",
   "bin": {

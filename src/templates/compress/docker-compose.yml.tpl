@@ -120,9 +120,6 @@ services:
 <% if (package.sslKey) { %>
       SSL_KEY: <%- package.sslKey %>
 <% } %>
-<% if (package.pdfLibs) { %>
-      PDFLIBS_URL: http://pdf-libs:8080
-<% } %>
 <% if (package.local) { %>
       FORMIO_S3_SERVER: minio
       FORMIO_S3_PORT: 9000

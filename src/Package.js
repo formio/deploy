@@ -102,7 +102,10 @@ class Package {
         const pkgName = this.pathParts.pop();
         const pkgPath = this.pathParts.join('.');
         this.package = _.get(this.options.packages, pkgPath, {})[pkgName];
-        if (semver.gt(this.options.pdfVersion, '4.0.0-rc.1')) {
+        if (!this.package) {
+            throw `Cannot find package ${pkgPath}.${pkgName}`;
+        }
+        if (this.options.pdfVersion === 'latest' || semver.gt(this.options.pdfVersion, '4.0.0-rc.1')) {
             this.package.pdfLibs = true;
         }
         this.currentDir = path.join(this.options.dir, 'current');
@@ -224,10 +227,16 @@ class Package {
     }
 
     async createPackage() {
-        const dataExists = await fsExtra.pathExists(path.join(this.currentDir, 'data'));
+        let dataExists = await fsExtra.pathExists(path.join(this.currentDir, 'data'));
         // Move the data folder out of the current directory.
         if (dataExists) {
-            await fsExtra.move(path.join(this.currentDir, 'data'), path.join(this.options.dir, '.tmp_data'));
+            try {
+                await fs.rmdir(path.join(this.options.dir, '.tmp_data'), { recursive: true });
+                await fsExtra.move(path.join(this.currentDir, 'data'), path.join(this.options.dir, '.tmp_data'));
+            }
+            catch (err) {
+                dataExists = false;
+            }
         }
         console.log(`Creating package ${this.outputPath}.`);
         await fs.mkdir(path.join('/', ...this.outputPath.split('/').slice(0, -1)), { recursive: true });

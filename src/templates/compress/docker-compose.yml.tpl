@@ -25,7 +25,7 @@ services:
 <% if (package.server) { %>
   api-server:
     image: <%- package.server %>
-    mem_limit: 1024m
+    mem_limit: 2048m
     restart: always
 <% if (package.local || package.pdf) { %>
     links:
@@ -90,7 +90,7 @@ services:
   pdf-server:
     image: <%- package.pdf %>
     restart: always
-    mem_limit: 1024m
+    mem_limit: 2048m
 <% if (package.local) { %>
     links:
       - mongo

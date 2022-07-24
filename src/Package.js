@@ -175,7 +175,12 @@ class Package {
             return;
         }
         if (!this.hasCert) {
-            await fs.rmdir(this.certsDir, { recursive: true });
+            try {
+                await fs.rmdir(this.certsDir, { recursive: true });
+            }
+            catch (err) {
+                // Ignore...
+            }
         }
         await fs.mkdir(this.certsDir, { recursive: true });
         console.log(`Creating Certificate: ${name}`)
@@ -189,7 +194,12 @@ class Package {
         await this.addCert(this.options.sslKey, async () => await fs.copyFile(path.join(this.pathOrLocal(this.options.sslKey)), path.join(this.certsDir, 'cert.key')));
         if (!this.hasCert) {
             // Delete the certs folder.
-            await fs.rmdir(this.certsDir, { recursive: true });
+            try {
+                await fs.rmdir(this.certsDir, { recursive: true });
+            }
+            catch (err) {
+                // Ignore.
+            }
         }
     }
 
@@ -201,7 +211,12 @@ class Package {
         }
         else {
             // Delete the nginx folder.
-            await fs.rmdir(path.join(this.currentDir, 'conf.d'), { recursive: true });
+            try {
+                await fs.rmdir(path.join(this.currentDir, 'conf.d'), { recursive: true });
+            }
+            catch (err) {
+                // Ignore.
+            }
         }
     }
 
@@ -212,7 +227,12 @@ class Package {
         }
         else {
             // Delete the platform folder.
-            await fs.rmdir(path.join(this.currentDir, '.platform'), { recursive: true });
+            try {
+                await fs.rmdir(path.join(this.currentDir, '.platform'), { recursive: true });
+            }
+            catch (err) {
+                // Ignore.
+            }
         }
     }
 

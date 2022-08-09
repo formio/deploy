@@ -4,7 +4,7 @@ module.exports = (program) => {
     program
         .command('package [path]').alias('p')
         .description('Create a new deployment package.')
-        .option('--dir', 'The default directory within your home folder to place the deployments.', defaultOptions.dir)
+        .option('--dir [dir]', 'The default directory within your home folder to place the deployments.', defaultOptions.dir)
         .option('--license [LICENSE_KEY]', 'Your deployment license.', defaultOptions.license)
         .option('--server [server]', 'The Form.io Enterprise Server Docker repo', defaultOptions.server)
         .option('--version [version]', 'The Form.io Enterprise Server version.', defaultOptions.version)

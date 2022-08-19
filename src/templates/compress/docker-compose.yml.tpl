@@ -1,6 +1,6 @@
 version: "3.8"
 services:
-<% if (package.local) { %>
+<% if (package.local && !options.hosted) { %>
   mongo:
     image: mongo
     restart: always
@@ -9,7 +9,7 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME:
       MONGO_INITDB_ROOT_PASSWORD:
-<% if (package.pdf) { %>
+<% if (package.pdf && !options.hosted) { %>
   minio:
     image: minio/minio
     restart: always
@@ -29,20 +29,23 @@ services:
     restart: always
 <% if (package.local || package.pdf) { %>
     links:
-<% if (package.local) { %>
+<% if (package.local && !options.hosted) { %>
       - mongo
 <% } %>
 <% if (package.pdf) { %>
       - pdf-server
 <% } %>
 <% } %>
-<% if (package.mongoCertName) { %>
+<% if (package.mongoCertName && !options.hosted) { %>
     volumes:
       - "./certs:/src/certs:ro"
 <% } %>
 <% if (package.local && !package.nginx) { %>
     ports:
       - "3000:3000"
+<% } else if (!package.nginx) { %>
+    ports:
+      - "<%- options.port %>:80"
 <% } %>
     environment:
 <% if (package.local) { %>
@@ -62,10 +65,10 @@ services:
       ADMIN_PASS: <%- options.adminPass %>
 <% } %>
 <% } %>
-<% if (package.mongo) { %>
+<% if (package.mongo && !options.hosted) { %>
       MONGO: <%- package.mongo %>
 <% } %>
-<% if (package.mongoCertName) { %>
+<% if (package.mongoCertName && !options.hosted) { %>
       MONGO_CA: /src/certs/<%- package.mongoCertName %>
 <% } %>
 <% if (package.pdf) { %>
@@ -74,10 +77,14 @@ services:
 <% if (package.proxy) { %>
       PROXY: "true"
 <% } %>
-<% if (package.portal) { %>
+<% if (package.portal && options.portal) { %>
       PORTAL_ENABLED: 1
 <% } %>
+<% if (package.nginx) { %>
       PORT: 3000
+<% } else { %>
+      PORT: 80
+<% } %>
 <% if (package.local) { %>
     env_file:
       - data/.env
@@ -91,27 +98,30 @@ services:
     image: <%- package.pdf %>
     restart: always
     mem_limit: 2048m
-<% if (package.local) { %>
+<% if (package.local && !options.hosted) { %>
     links:
       - mongo
       - minio
 <% } %>
-<% if (package.mongoCertName) { %>
+<% if (package.mongoCertName && !options.hosted) { %>
     volumes:
       - "./certs:/src/certs:ro"
 <% } %>
 <% if (package.local && !package.nginx) { %>
     ports:
       - "4005:4005"
+<% } else if (!package.nginx) { %>
+    ports:
+      - "<%- options.port %>:80"
 <% } %>
     environment:
 <% if (package.local && options.license) { %>
       LICENSE_KEY: <%- options.license %>
 <% } %>
-<% if (package.mongo) { %>
+<% if (package.mongo && !options.hosted) { %>
       MONGO: <%- package.mongo %>
 <% } %>
-<% if (package.mongoCertName) { %>
+<% if (package.mongoCertName && !options.hosted) { %>
       MONGO_CA: /src/certs/<%- package.mongoCertName %>
 <% } %>
 <% if (package.sslCert) { %>
@@ -120,14 +130,18 @@ services:
 <% if (package.sslKey) { %>
       SSL_KEY: <%- package.sslKey %>
 <% } %>
-<% if (package.local) { %>
+<% if (package.local && !options.hosted) { %>
       FORMIO_S3_SERVER: minio
       FORMIO_S3_PORT: 9000
       FORMIO_S3_BUCKET: formio
       FORMIO_S3_KEY: CHANGEME
       FORMIO_S3_SECRET: CHANGEME
 <% } %>
+<% if (package.nginx) { %>
       FORMIO_PDF_PORT: 4005
+<% } else { %>
+      FORMIO_PDF_PORT: 80
+<% } %>
 <% if (package.local) { %>
     env_file:
       - data/.env
@@ -136,7 +150,7 @@ services:
       - .env
 <% } %>
 <% } %>
-<% if (!package.local || package.nginx) { %>
+<% if (package.nginx) { %>
   nginx-proxy:
     image: nginx
     restart: always

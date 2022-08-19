@@ -21,6 +21,8 @@ module.exports = (program) => {
         .option('--ssl-cert [cert]', 'File path or URL to the SSL Certificate for the deployment to enable SSL.')
         .option('--ssl-key [key]', 'File path or URL to the SSL Certificate Key for the deployment to enable SSL.')
         .option('--port [port]', 'The port to use for NGINX configurations.')
+        .option('--hosted', 'If this is a hosted environment and comes with its own MongoDB interface')
+        .option('--no-portal', 'If you do not wish to have the portal')
         .option('--save', 'Save the configuration parameters into a local .env file for future deployments.')
         .action(async (path, options) => {
             if (!path) {

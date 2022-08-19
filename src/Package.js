@@ -37,6 +37,8 @@ class Package {
             adminEmail: 'admin@example.com',
             adminPass: 'CHANGEME',
             port: '80',
+            hosted: false,
+            portal: true,
             default: true
         };
     }
@@ -139,6 +141,9 @@ class Package {
         if (this.package.full) {
             return this.package;
         }
+        if (!this.package.hasOwnProperty('nginx')) {
+            this.package.nginx = false;
+        }
         if (!this.package.hasOwnProperty('server')) {
             this.package.server = this.options.server;
         }
@@ -189,10 +194,12 @@ class Package {
     }
 
     async addCerts() {
-        await this.addCert(this.package.mongoCertName, async () => await fs.writeFile(path.join(this.certsDir, this.package.mongoCertName), await this.fileContents(this.package.mongoCert)));
-        await this.addCert(this.options.sslCert, async () => await fs.copyFile(path.join(this.pathOrLocal(this.options.sslCert)), path.join(this.certsDir, 'cert.crt')));
-        await this.addCert(this.options.sslKey, async () => await fs.copyFile(path.join(this.pathOrLocal(this.options.sslKey)), path.join(this.certsDir, 'cert.key')));
-        if (!this.hasCert) {
+        if (!this.options.hosted) {
+            await this.addCert(this.package.mongoCertName, async () => await fs.writeFile(path.join(this.certsDir, this.package.mongoCertName), await this.fileContents(this.package.mongoCert)));
+            await this.addCert(this.options.sslCert, async () => await fs.copyFile(path.join(this.pathOrLocal(this.options.sslCert)), path.join(this.certsDir, 'cert.crt')));
+            await this.addCert(this.options.sslKey, async () => await fs.copyFile(path.join(this.pathOrLocal(this.options.sslKey)), path.join(this.certsDir, 'cert.key')));    
+        }
+        if (!this.hasCert || this.options.hosted) {
             // Delete the certs folder.
             try {
                 await fs.rmdir(this.certsDir, { recursive: true });
@@ -204,7 +211,7 @@ class Package {
     }
 
     async addNGINX() {
-        if (!this.package.local || this.package.nginx) {
+        if (this.package.nginx) {
             console.log('Adding NGINX configuration.');
             await fs.mkdir(path.join(this.currentDir, 'conf.d'), { recursive: true });
             await fs.writeFile(path.join(this.currentDir, 'conf.d', 'default.conf'), templates.nginx(this.package, this.options));

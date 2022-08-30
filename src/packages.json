@@ -15,7 +15,8 @@
                 "pdf": "formio/uswds-viewer",
                 "mongoCert": "https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem",
                 "pdfVersion": "<%- options.uswdsVersion %>",
-                "aws": true
+                "aws": true,
+                "nginx": true
             },
             "multicontainer.zip": {
                 "mongoCert": "https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem",

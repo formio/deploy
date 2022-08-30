@@ -231,11 +231,13 @@ class Package {
         if (this.package.aws) {
             console.log('Adding AWS extensions');
             await fsExtra.copy(path.join(this.templateDir, '.platform'), path.join(this.currentDir, '.platform'));
+            await fsExtra.copy(path.join(this.templateDir, '.ebextensions'), path.join(this.currentDir, '.ebextensions'));
         }
         else {
             // Delete the platform folder.
             try {
                 await fs.rmdir(path.join(this.currentDir, '.platform'), { recursive: true });
+                await fs.rmdir(path.join(this.currentDir, '.ebextensions'), { recursive: true });
             }
             catch (err) {
                 // Ignore.

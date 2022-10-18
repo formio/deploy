@@ -36,6 +36,9 @@ module.exports = (program) => {
                 case 'manager.test-form.io':
                     cloudfront = 'E1FSS9J2KV6QL4';
                     break;
+                case 'edge.form.io':
+                    cloudfront = 'E2IPD36UKEMHZJ';
+                    break;
             }
             await shell(`aws s3 sync --acl public-read --exclude "node_modules/*" --exclude ".git/*" ${source} s3://${destination}`);
             if (cloudfront) {

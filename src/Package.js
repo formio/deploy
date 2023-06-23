@@ -255,39 +255,47 @@ class Package {
         }
     }
 
+    async createLocalEnv() {
+        let envFile = '';
+        envFile += `LICENSE_KEY=${(this.options.license || 'YOUR_LICENSE')}\n`;
+        await fsExtra.writeFile(path.join(this.currentDir, 'data', '.env'), envFile);
+    }
+
     async createPackage() {
         let dataExists = await fsExtra.pathExists(path.join(this.currentDir, 'data'));
-        // Move the data folder out of the current directory.
-        if (dataExists) {
-            try {
-                await fs.rmdir(path.join(this.options.dir, '.tmp_data'), { recursive: true });
-                await fsExtra.move(path.join(this.currentDir, 'data'), path.join(this.options.dir, '.tmp_data'));
+        if (this.package.local) {
+            if (isLocal) {
+                if (dataExists) {
+                    await fs.rmdir(path.join(this.currentDir, 'data'), { recursive: true });
+                }
+                await fs.mkdir(path.join(this.currentDir, 'data'), { recursive: true });
             }
-            catch (err) {
-                dataExists = false;
+            else if (dataExists) {
+                try {
+                    await fs.rmdir(path.join(this.options.dir, '.tmp_data'), { recursive: true });
+                    await fsExtra.move(path.join(this.currentDir, 'data'), path.join(this.options.dir, '.tmp_data'));
+                }
+                catch (err) {
+                    dataExists = false;
+                }
             }
         }
         console.log(`Creating package ${this.outputPath}.`);
         await fs.mkdir(path.join('/', ...this.outputPath.split('/').slice(0, -1)), { recursive: true });
+
+        // If this is a local build and creating a local package, then we will create our own data folder and add the .env to it.
+        if (isLocal && this.package.local) {
+            await this.createLocalEnv();
+        }
+
         zipper.sync.zip(path.join(this.currentDir, '/')).compress().save(this.outputPath);
-        if (this.package.local) {
-            // Move the data folder back.
+
+        if (!isLocal && this.package.local) {
             if (dataExists) {
                 await fsExtra.move(path.join(this.options.dir, '.tmp_data'), path.join(this.currentDir, 'data'));
             }
             else {
-                await fs.mkdir(path.join(this.currentDir, 'data'), { recursive: true });
-            }
-
-            // Create the .env file.
-            if (this.options.save) {
-                let envFile = '';
-                if (this.options.license) {
-                    envFile += `LICENSE=${this.options.license}\\n`;
-                }
-                if (this.options.dbSecret) {
-                    envFile += `LICENSE=${this.options.license}\\n`;
-                }
+                await this.createLocalEnv();
             }
         }
     }

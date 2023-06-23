@@ -40,7 +40,7 @@ services:
     volumes:
       - "./certs:/src/certs:ro"
 <% } %>
-<% if (package.local && !package.nginx) { %>
+<% if (package.local || !package.nginx) { %>
     ports:
       - "3000:3000"
 <% } else if (!package.nginx) { %>
@@ -49,9 +49,6 @@ services:
 <% } %>
     environment:
 <% if (package.local) { %>
-<% if (options.license) { %>
-      LICENSE_KEY: <%- options.license %>
-<% } %>
 <% if (options.dbSecret) { %>
       DB_SECRET: <%- options.dbSecret %>
 <% } %>
@@ -107,7 +104,7 @@ services:
     volumes:
       - "./certs:/src/certs:ro"
 <% } %>
-<% if (package.local && !package.nginx) { %>
+<% if (package.local || !package.nginx) { %>
     ports:
       - "4005:4005"
 <% } else if (!package.nginx) { %>
@@ -115,9 +112,6 @@ services:
       - "<%- options.port %>:80"
 <% } %>
     environment:
-<% if (package.local && options.license) { %>
-      LICENSE_KEY: <%- options.license %>
-<% } %>
 <% if (package.mongo && !options.hosted) { %>
       MONGO: <%- package.mongo %>
 <% } %>

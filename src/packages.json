@@ -45,20 +45,17 @@
         "multicontainer.zip": {
             "local": true,
             "mongo": "mongodb://mongo:27017/formio",
-            "includeEnv": true,
             "nginx": true
         },
         "api-server.zip": {
             "local": true,
             "mongo": "mongodb://mongo:27017/formio",
-            "pdf": false,
-            "includeEnv": true
+            "pdf": false
         },
         "pdf-server.zip": {
             "local": true,
             "mongo": "mongodb://mongo:27017/formio",
-            "server": false,
-            "includeEnv": true
+            "server": false
         }
     }
 }

@@ -263,11 +263,11 @@ class Package {
 
     async createPackage() {
         let dataExists = await fsExtra.pathExists(path.join(this.currentDir, 'data'));
+        if (isLocal && dataExists) {
+            await fs.rmdir(path.join(this.currentDir, 'data'), { recursive: true });
+        }
         if (this.package.local) {
             if (isLocal) {
-                if (dataExists) {
-                    await fs.rmdir(path.join(this.currentDir, 'data'), { recursive: true });
-                }
                 await fs.mkdir(path.join(this.currentDir, 'data'), { recursive: true });
             }
             else if (dataExists) {

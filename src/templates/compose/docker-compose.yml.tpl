@@ -40,7 +40,7 @@ services:
     volumes:
       - "./certs:/src/certs:ro"
 <% } %>
-<% if (package.local || !package.nginx) { %>
+<% if (package.local) { %>
     ports:
       - "3000:3000"
 <% } else if (!package.nginx) { %>
@@ -104,7 +104,7 @@ services:
     volumes:
       - "./certs:/src/certs:ro"
 <% } %>
-<% if (package.local || !package.nginx) { %>
+<% if (package.local) { %>
     ports:
       - "4005:4005"
 <% } else if (!package.nginx) { %>

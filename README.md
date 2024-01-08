@@ -12,6 +12,10 @@ To install this library, you can type the following in your terminal.
 npm install -g @formio/deploy
 ```
 
+## Requirements
+
+You'll need NodeJS >= 18.
+
 ## Usage
 You can now use this CLI to create deployment packages.
 

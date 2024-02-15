@@ -5,6 +5,9 @@ This repo contains all of the deployment strategies for the Form.io Enterprise P
  - Terraform (coming soon)
  - Kubernetes (coming soon)
 
+## Requirements
+To run this tool, you'll need NodeJS v16 or higher.
+
 ## Installation
 To install this library, you can type the following in your terminal.
 

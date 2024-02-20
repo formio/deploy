@@ -3,7 +3,7 @@ This repo contains all of the deployment strategies for the Form.io Enterprise P
 
  - Docker Compose
  - Terraform (coming soon)
- - Kubernetes (coming soon)
+ - Kubernetes
 
 ## Requirements
 To run this tool, you'll need NodeJS v16 or higher.
@@ -77,7 +77,7 @@ and then type the following to run.
 docker-compose -f ~/deployments/current/docker-compose.yml up
 ```
 
-### Kubernetes Examples
+### [Kubernetes Deployment Guide](https://help.form.io/deployments/deployment-guide/kubernetes)
 
 #### CLI Variables
 PROVIDER = aws | azure  

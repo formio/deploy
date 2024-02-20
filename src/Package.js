@@ -228,7 +228,7 @@ class Package {
     }
 
     async addExtensions() {
-        if (this.package.aws) {
+        if (this.package.aws && this.pathParts[0] !== 'helm') {
             console.log('Adding AWS extensions');
             await fsExtra.copy(path.join(this.templateDir, '.platform'), path.join(this.currentDir, '.platform'));
             await fsExtra.copy(path.join(this.templateDir, '.ebextensions'), path.join(this.currentDir, '.ebextensions'));
@@ -248,9 +248,22 @@ class Package {
     async addManifest() {
         console.log(`Creating ${this.type} manifest.`);
         const manifest = templates[this.type](this.package, this.options);
+    
         switch (this.type) {
             case 'compose':
-                await fs.writeFile(path.join(this.currentDir, 'docker-compose.yml'), manifest, {encoding:'utf8',flag:'w'});
+                await fs.writeFile(path.join(this.currentDir, 'docker-compose.yml'), manifest, 'utf8');
+                break;
+            case 'helm':
+                for (const [relativePath, fileContents] of Object.entries(manifest)) {
+                    const fullPath = path.join(this.currentDir, 'helm', relativePath);
+                    const dir = path.dirname(fullPath);
+    
+                    // Create the directory if it doesn't exist
+                    await fs.mkdir(dir, { recursive: true });
+    
+                    // Write the file
+                    await fs.writeFile(fullPath.replace('.tpl', ''), fileContents, 'utf8');
+                }
                 break;
         }
     }

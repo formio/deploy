@@ -76,3 +76,160 @@ and then type the following to run.
 ```
 docker-compose -f ~/deployments/current/docker-compose.yml up
 ```
+
+### Kubernetes Examples
+
+#### CLI Variables
+PROVIDER = aws | azure  
+API_NAMESPACE = formio-dev | formio-staging | formio-prod  
+PDF_NAMESPACE = formio-pdf  
+LICENSE_KEY = your_formio_license_key
+
+#### API Server (Portal Enabled)
+
+```sh
+PROVIDER=azure
+API_NAMESPACE=formio-dev
+PDF_NAMESPACE=formio-pdf
+LICENSE_KEY=your_license_key_here
+
+echo ""
+echo "Provider: $PROVIDER"
+echo "Namespace API: $API_NAMESPACE"
+echo "Namespace PDF: $PDF_NAMESPACE"
+echo "License Key: $LICENSE_KEY"
+echo ""
+
+# Create helm deployment zip
+formio-deploy package helm/$PROVIDER/api-server.zip \
+--license=$LICENSE_KEY \
+--version=8.4.1 \
+--admin-email='admin@example.com' \
+--admin-pass='CHANGEME' \
+--db-secret='CHANGEME' \
+--jwt-secret='CHANGEME' \
+--pdf-server-url="http://pdf-server.$PDF_NAMESPACE.svc.cluster.local:4005" \
+--base-url="$API_NAMESPACE.localdev.me" # dev.<your-domain>.com | authoring.<your-domain>.com
+
+# Unzip helm deployment
+cd ./deployments/helm/$PROVIDER
+unzip -d . api-server.zip && mv helm api-server
+
+# Change to directory
+cd api-server
+
+# View current .env (This should be edited before continuing)
+cat .env
+
+# Deploy
+bash scripts/upgrade.sh --namespace $API_NAMESPACE --path ./deployment
+```
+
+#### Remote API Server
+
+```sh
+PROVIDER=azure
+API_NAMESPACE=formio-staging
+PDF_NAMESPACE=formio-pdf
+LICENSE_KEY=your_license_key_here
+
+echo ""
+echo "Provider: $PROVIDER"
+echo "Namespace API: $API_NAMESPACE"
+echo "Namespace PDF: $PDF_NAMESPACE"
+echo "License Key: $LICENSE_KEY"
+
+# Create helm deployment zip
+formio-deploy package helm/$PROVIDER/remote-server.zip \
+--no-portal \
+--license=$LICENSE_KEY \
+--version=8.4.1 \
+--admin-email='admin@example.com' \
+--admin-pass='CHANGEME' \
+--db-secret='CHANGEME' \
+--jwt-secret='CHANGEME' \
+--portal-secret='CHANGEME' \
+--pdf-server-url="http://pdf-server.$PDF_NAMESPACE.svc.cluster.local:4005" \
+--base-url="$API_NAMESPACE.localdev.me" # staging.<your-domain>.com | uat.<your-domain>.com | live.<your-domain>.com
+
+# Unzip helm deployment
+cd ./deployments/helm/$PROVIDER
+unzip -d . remote-server.zip && mv helm remote-server
+
+# Change to directory
+cd remote-server
+
+# View current .env (This should be edited before continuing)
+cat .env
+
+# Deploy
+bash scripts/upgrade.sh --namespace $API_NAMESPACE --path ./deployment
+```
+
+#### PDF Server
+
+```sh
+PROVIDER=azure
+PDF_NAMESPACE=formio-pdf
+LICENSE_KEY=your_license_key_here
+
+echo ""
+echo "Provider: $PROVIDER"
+echo "Namespace PDF: $PDF_NAMESPACE"
+echo "License Key: $LICENSE_KEY"
+
+# Create helm deployment zip
+formio-deploy package helm/$PROVIDER/pdf-server.zip \
+--license=$LICENSE_KEY \
+--pdf-version=5.4.2
+
+# Unzip helm deployment
+cd ./deployments/helm/$PROVIDER
+unzip -d . pdf-server.zip && mv helm pdf-server
+
+# Change to directory
+cd pdf-server
+
+# View current .env (This should be edited before continuing)
+cat .env
+
+# Deploy
+bash scripts/upgrade.sh --namespace $PDF_NAMESPACE --path ./deployment
+```
+
+##### Multicontainer
+
+```sh
+PROVIDER=azure
+API_NAMESPACE=formio-prod
+LICENSE_KEY=your_license_key_here
+
+echo ""
+echo "Provider: $PROVIDER"
+echo "Namespace API: $API_NAMESPACE"
+echo "License Key: $LICENSE_KEY"
+
+# Create helm deployment zip
+formio-deploy package helm/$PROVIDER/multicontainer.zip \
+--license=$LICENSE_KEY \
+--version=8.4.1 \
+--pdf-version=5.4.2 \
+--admin-email='admin@example.com' \
+--admin-pass='CHANGEME' \
+--db-secret='CHANGEME' \
+--jwt-secret='CHANGEME' \
+--base-url="$API_NAMESPACE.localdev.me"
+
+# Unzip helm deployment
+cd $(pwd)/deployments/helm/$PROVIDER
+unzip -d . multicontainer.zip && mv helm multicontainer
+
+# Change to directory
+cd multicontainer
+
+# View current .env (This should be edited before continuing)
+cat .env
+
+# Deploy
+bash scripts/upgrade.sh --namespace  $API_NAMESPACE --path ./deployment
+```

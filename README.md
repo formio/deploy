@@ -112,7 +112,7 @@ formio-deploy package helm/$PROVIDER/api-server.zip \
 --base-url="$API_NAMESPACE.localdev.me" # dev.<your-domain>.com | authoring.<your-domain>.com
 
 # Unzip helm deployment
-cd ./deployments/helm/$PROVIDER
+cd ~/deployments/helm/$PROVIDER
 unzip -d . api-server.zip && mv helm api-server
 
 # Change to directory
@@ -153,7 +153,7 @@ formio-deploy package helm/$PROVIDER/remote-server.zip \
 --base-url="$API_NAMESPACE.localdev.me" # staging.<your-domain>.com | uat.<your-domain>.com | live.<your-domain>.com
 
 # Unzip helm deployment
-cd ./deployments/helm/$PROVIDER
+cd ~/deployments/helm/$PROVIDER
 unzip -d . remote-server.zip && mv helm remote-server
 
 # Change to directory
@@ -184,7 +184,7 @@ formio-deploy package helm/$PROVIDER/pdf-server.zip \
 --pdf-version=5.4.2
 
 # Unzip helm deployment
-cd ./deployments/helm/$PROVIDER
+cd ~/deployments/helm/$PROVIDER
 unzip -d . pdf-server.zip && mv helm pdf-server
 
 # Change to directory
@@ -214,6 +214,7 @@ formio-deploy package helm/$PROVIDER/multicontainer.zip \
 --license=$LICENSE_KEY \
 --version=8.4.1 \
 --pdf-version=5.4.2 \
+--pdf-server-url="http://pdf-server:4005" \
 --admin-email='admin@example.com' \
 --admin-pass='CHANGEME' \
 --db-secret='CHANGEME' \
@@ -221,7 +222,7 @@ formio-deploy package helm/$PROVIDER/multicontainer.zip \
 --base-url="$API_NAMESPACE.localdev.me"
 
 # Unzip helm deployment
-cd $(pwd)/deployments/helm/$PROVIDER
+cd ~/deployments/helm/$PROVIDER
 unzip -d . multicontainer.zip && mv helm multicontainer
 
 # Change to directory

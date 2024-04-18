@@ -1,0 +1,49 @@
+version: "3.8"
+services:
+  minio:
+    image: minio/minio
+    restart: always
+    volumes:
+      - "./data/minio/data:/data"
+      - "./data/minio/config:/root/.minio"
+    environment:
+      MINIO_ACCESS_KEY: CHANGEME
+      MINIO_SECRET_KEY: CHANGEME
+    command: server /data
+  api-server:
+    image: formio/formio-enterprise:latest
+    mem_limit: 2048m
+    restart: always
+    links:
+      - pdf-server
+    ports:
+      - "3000:3000"
+      
+    env_file:
+      - .env
+    volumes:
+      - ./data:/data
+  pdf-server:
+    image: formio/pdf-server:latest
+    restart: always
+    mem_limit: 2048m
+    links:
+      - minio
+    ports:
+      - "4005:4005"
+    env_file:
+      - .env
+    volumes:
+      - ./data:/data
+    
+  nginx-proxy:
+    image: nginx
+    restart: always
+    mem_limit: 128m
+    ports:
+      - "80:80"
+    volumes:
+      - "./conf.d:/etc/nginx/conf.d:ro"
+    links:
+      - api-server
+      - pdf-server

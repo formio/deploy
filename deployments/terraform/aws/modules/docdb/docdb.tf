@@ -1,3 +1,6 @@
+
+# there is an issue passing availability_zones to docdb module, 
+# https://github.com/hashicorp/terraform-provider-aws/issues/19451
 resource "aws_docdb_cluster" "formio-docdb-cluster" {
 
   cluster_identifier = "formio-docdb-cluster"

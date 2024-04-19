@@ -40,7 +40,6 @@ module "docdb" {
   vpc_id                 = module.vpc.vpc_id
   vpc_cidr               = var.vpc_cidr
   subnet_ids             = module.vpc.private_subnet_ids
-  availability_zones     = var.availability_zones
   master_password        = var.docdb_master_password
   master_username        = var.docdb_master_username
   cluster_instance_count = local.docdb_cluster_instance_count

@@ -3,11 +3,7 @@ variable "app_version" {
   description = "unique version label for the application deployment"
 }
 
-variable "availability_zones" {
-  type        = list(string)
-  description = "Availability Zones"
 
-}
 variable "vpc_id" {
   type        = string
   description = "VPC ID"
@@ -16,11 +12,7 @@ variable "deployment_s3_bucket" {
   type        = string
   description = "S3 bucket where deployment artifacts are stored"
 }
-# variable "deployment_s3_key" {
-#   type        = string
-#   description = "S3 key where deployment artifacts are stored"
 
-# }
 variable "private_security_group_id" {
   type        = string
   description = "security group that connects to vpc private subnets"

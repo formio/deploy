@@ -251,7 +251,7 @@ class Package {
     
         switch (this.type) {
             case 'compose':
-                await fs.writeFile(path.join(this.currentDir, 'docker-compose.yml'), manifest, 'utf8');
+                await fs.writeFile(path.join(this.currentDir, 'docker-compose.yml'), manifest, {encoding:'utf8',flag:'w'});
                 break;
             case 'helm':
                 for (const [relativePath, fileContents] of Object.entries(manifest)) {
@@ -262,7 +262,7 @@ class Package {
                     await fs.mkdir(dir, { recursive: true });
     
                     // Write the file
-                    await fs.writeFile(fullPath.replace('.tpl', ''), fileContents, 'utf8');
+                    await fs.writeFile(fullPath.replace('.tpl', ''), fileContents, {encoding:'utf8',flag:'w'});
                 }
                 break;
         }

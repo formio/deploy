@@ -2,24 +2,28 @@
     "compose": {
         "aws": {
             "api-server.zip": {
-                "mongoCert": "https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem",
+                "mongoCert": "https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem",
+                "mongoCertName": "rds-combined-ca-bundle.pem",
                 "pdf": false,
                 "aws": true
             },
             "pdf-server.zip": {
-                "mongoCert": "https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem",
+                "mongoCert": "https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem",
+                "mongoCertName": "rds-combined-ca-bundle.pem",
                 "server": false,
                 "aws": true
             },
             "uswds-viewer.zip": {
                 "pdf": "formio/uswds-viewer",
-                "mongoCert": "https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem",
+                "mongoCert": "https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem",
+                "mongoCertName": "rds-combined-ca-bundle.pem",
                 "pdfVersion": "<%- options.uswdsVersion %>",
                 "aws": true,
                 "nginx": true
             },
             "multicontainer.zip": {
-                "mongoCert": "https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem",
+                "mongoCert": "https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem",
+                "mongoCertName": "rds-combined-ca-bundle.pem",
                 "aws": true,
                 "nginx": true
             },

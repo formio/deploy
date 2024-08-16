@@ -1,7 +1,7 @@
 const shell = require('@travist/async-shell');
 module.exports = (program) => {
     program
-        .command('push <source> <destination>').alias('p')
+        .command('push <source> <destination>')
         .description('Push an application to a hosted environment.')
         .action(async (source, destination) => {
             let downloaded = false;

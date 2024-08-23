@@ -2,36 +2,34 @@
     "compose": {
         "aws": {
             "api-server.zip": {
-                "mongoCert": "https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem",
+                "mongoCert": "https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem",
                 "pdf": false,
                 "aws": true
             },
             "pdf-server.zip": {
-                "mongoCert": "https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem",
+                "mongoCert": "https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem",
                 "server": false,
                 "aws": true
             },
             "uswds-viewer.zip": {
                 "pdf": "formio/uswds-viewer",
-                "mongoCert": "https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem",
+                "mongoCert": "https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem",
                 "pdfVersion": "<%- options.uswdsVersion %>",
                 "aws": true,
                 "nginx": true
             },
             "multicontainer.zip": {
-                "mongoCert": "https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem",
+                "mongoCert": "https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem",
                 "aws": true,
                 "nginx": true
             },
             "multicontainer.gov.zip": {
                 "mongoCert": "https://truststore.pki.us-gov-west-1.rds.amazonaws.com/global/global-bundle.pem",
-                "mongoCertName": "rds-combined-ca-us-gov-bundle.pem",
                 "aws": true,
                 "nginx": true
             },
             "multicontainer.gov.ssl.zip": {
                 "mongoCert": "https://truststore.pki.us-gov-west-1.rds.amazonaws.com/global/global-bundle.pem",
-                "mongoCertName": "rds-combined-ca-us-gov-bundle.pem",
                 "ssl": true,
                 "aws": true,
                 "nginx": true

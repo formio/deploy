@@ -1,0 +1,9 @@
+apiVersion: v2
+name: formio-enterprise
+description: A Helm chart for Form.io Enterprise
+
+type: application
+
+version: 1.0.0
+
+appVersion: "9.5.0_5.10.15"

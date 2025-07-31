@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  formio-enterprise:
+  - apiVersion: v2
+    appVersion: 9.5.0_5.10.15
+    created: "2025-07-31T12:06:21.468927-05:00"
+    description: A Helm chart for Form.io Enterprise
+    digest: 54f558c00584234aead5f8395bd6934d489051bd24c495b0a98ff1d47049833b
+    name: formio-enterprise
+    type: application
+    urls:
+    - https://formio.github.io/deploy/deployments/helm/formio-enterprise/formio-enterprise-1.0.0.tgz
+    version: 1.0.0
+generated: "2025-07-31T12:06:21.467655-05:00"

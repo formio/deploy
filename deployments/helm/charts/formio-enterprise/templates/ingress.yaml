@@ -1,0 +1,75 @@
+{{- if .Values.api.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ (printf "%s-%s" (include "formio-enterprise-fullname" .) ($.Values.api.name | required "api.name is required")) }}
+  labels:
+    {{ include "formio-enterprise-labels" . | nindent 4 }}
+  {{- with .Values.api.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with .Values.api.ingress.className }}
+  ingressClassName: {{ . }}
+  {{- end }}
+  tls: 
+    {{- range .Values.api.ingress.tls }}
+    - hosts:
+      {{- range .hosts }}
+      - {{ . | quote }}
+      {{- end }}
+      secretName: {{ .secretName }}
+    {{- end }}
+  rules:
+    {{- range .Values.api.ingress.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+        - path: {{ $.Values.api.ingress.path | default "/" }}
+          pathType: {{ $.Values.api.ingress.pathType | default "Prefix" }}
+          backend:
+            service:
+              name: {{ (printf "%s-%s" (include "formio-enterprise-fullname" $) ($.Values.api.name | required "api.name is required")) }}
+              port:
+                number: {{ $.Values.api.service.port | default 80 }}
+    {{- end }}
+{{- end }}
+---
+{{- if and .Values.pdf.enabled .Values.pdf.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ (printf "%s-%s" (include "formio-enterprise-fullname" .) ($.Values.pdf.name | required "pdf.name is required")) }}
+  labels:
+    {{ include "formio-enterprise-labels" . | nindent 4 }}
+  {{- with .Values.pdf.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with .Values.pdf.ingress.className }}
+  ingressClassName: {{ . }}
+  {{- end }}
+  tls: 
+    {{- range .Values.pdf.ingress.tls }}
+    - hosts:
+      {{- range .hosts }}
+      - {{ . | quote }}
+      {{- end }}
+      secretName: {{ .secretName }}
+    {{- end }}
+  rules:
+    {{- range .Values.pdf.ingress.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+        - path: {{ $.Values.pdf.ingress.path | default "/" }}
+          pathType: {{ $.Values.pdf.ingress.pathType | default "Prefix" }}
+          backend:
+            service:
+              name: {{ (printf "%s-%s" (include "formio-enterprise-fullname" $) ($.Values.pdf.name | required "pdf.name is required")) }}
+              port:
+                number: {{ $.Values.pdf.service.port | default 80 }}
+    {{- end }}
+{{- end }}

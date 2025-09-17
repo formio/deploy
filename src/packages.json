@@ -55,41 +55,5 @@
             "mongo": "mongodb://mongo:27017/formio",
             "server": false
         }
-    },
-    "helm": {
-        "azure": {
-            "multicontainer.zip": {
-                "azure": true
-            },
-            "api-server.zip": {
-                "pdf": false,
-                "azure": true
-            },
-            "remote-server.zip": {
-                "pdf": false,
-                "azure": true
-            },
-            "pdf-server.zip": {
-                "server": false,
-                "azure": true
-            }
-        },
-        "aws": {
-            "multicontainer.zip": {
-                "aws": true
-            },
-            "api-server.zip": {
-                "pdf": false,
-                "aws": true
-            },
-            "remote-server.zip": {
-                "pdf": false,
-                "aws": true
-            },
-            "pdf-server.zip": {
-                "server": false,
-                "aws": true
-            }
-        }
     }
 }

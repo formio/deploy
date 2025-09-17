@@ -1,0 +1,48 @@
+secret:
+  name: formio-enterprise-secret
+  existingSecret: false
+  common:
+    mongo: "mongodb://..."
+    licenseKey: "eyJhb..."
+    dbSecret: "CHANGEME"
+  api:
+    portalSecret: "CHANGEME"
+    adminPass: "CHANGEME"
+    jwtSecret: "CHANGEME"
+  pdf:
+    formioPdfAdminkey: "CHANGEME"
+    formioS3Key: "AKIA..."
+    formioS3Secret: "N8icd.../o2..."
+
+common:
+  env:
+    licenseRemote: true
+
+api:
+  image:
+    tag: "9.5.0"
+  env:
+    portalEnabled: true
+    adminEmail: admin@example.com
+    debug: formio.*
+  service:
+    type: LoadBalancer
+    port: 80
+  ingress:
+    enabled: true
+    className: ""
+    hosts:
+      - host: ""
+        path: /
+        pathType: Prefix
+    tls: []
+
+pdf:
+  enabled: true
+  image:
+    tag: "5.10.15"
+  fileStorageProvider: aws
+  env:
+    formioS3Bucket: dev-bucket
+    formioS3Region: us-east-2   
+    debug: pdf.*

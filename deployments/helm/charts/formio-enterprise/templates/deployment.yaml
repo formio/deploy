@@ -1,0 +1,270 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ (printf "%s-%s" (include "formio-enterprise-fullname" .) .Values.api.name) }}
+  labels:
+    {{- include "formio-enterprise-labels" . | nindent 4 }}
+    app.kubernetes.io/component: {{ .Values.api.name }}
+spec:
+  {{- if not .Values.api.deployment.autoscaling.enabled }}
+  replicas: {{ .Values.api.deployment.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "formio-enterprise-selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: {{ .Values.api.name }}
+  template:
+    metadata:
+      {{- with .Values.api.deployment.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "formio-enterprise-labels" . | nindent 8 }}
+        app.kubernetes.io/component: {{ .Values.api.name }}
+        {{- with .Values.api.deployment.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      serviceAccountName: {{ include "formio-enterprise-serviceAccountName" . }}
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.api.deployment.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ (printf "%s-%s" (include "formio-enterprise-fullname" .) .Values.api.name) }}
+          {{- with .Values.api.deployment.securityContext }}
+            securityContext:
+              {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{- if .Values.global.imageRegistry }}{{ trimSuffix "/" .Values.global.imageRegistry }}/{{ end }}{{ .Values.api.image.repository }}:{{ .Values.api.image.tag }}"
+          imagePullPolicy: {{ .Values.api.image.pullPolicy }}
+          env:
+            {{- include "formio-enterprise.envVars" (dict "component" "api" "Values" .Values "Release" .Release) | nindent 12 }}
+            {{- if .Values.pdf.enabled }}
+            - name: PDF_SERVER
+              value: {{ .Values.api.env.pdfServer | default (printf "http://%s-%s.%s.svc.cluster.local:%d" (include "formio-enterprise-fullname" .) .Values.pdf.name .Release.Namespace (.Values.pdf.service.port | default 80 | int)) }}
+            {{- end }}
+            {{- $apiExtraVars := (default list .Values.api.env.extraVars) }}
+            {{- $commonExtraVars := (default list .Values.common.env.extraVars) }}
+            {{- $allApiExtraVars := concat $apiExtraVars $commonExtraVars }}
+            {{- range $allApiExtraVars }}
+            - name: {{ .name }}
+              value: {{ .value | quote }}
+            {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.api.env.PORT | default 80 }}
+              protocol: TCP
+          {{- if .Values.api.deployment.livenessProbe.enabled }}
+          {{- with .Values.api.deployment.livenessProbe }}
+          livenessProbe:
+            {{- include "formio-enterprise.probe" (dict "probe" . "defaultPort" 80) | nindent 12 }}
+          {{- end }}
+          {{- end }}
+          {{- if .Values.api.deployment.readinessProbe.enabled }}
+          {{- with .Values.api.deployment.readinessProbe }}
+          readinessProbe:
+            {{- include "formio-enterprise.probe" (dict "probe" . "defaultPort" 80) | nindent 12 }}
+          {{- end }}
+          {{- end }}
+          {{- if .Values.api.deployment.startupProbe.enabled }}
+          {{- with .Values.api.deployment.startupProbe }}
+          startupProbe:
+            {{- include "formio-enterprise.probe" (dict "probe" . "defaultPort" 80) | nindent 12 }}
+          {{- end }}
+          {{- end }}
+          {{- with .Values.api.deployment.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.api.deployment.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.api.deployment.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.api.deployment.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.api.deployment.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.api.deployment.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.api.deployment.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ .Values.api.deployment.terminationGracePeriodSeconds }}
+      {{- end }}
+      {{- with .Values.api.deployment.hostAliases }}
+      hostAliases:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.api.deployment.dnsPolicy }}
+      dnsPolicy: {{ .Values.api.deployment.dnsPolicy }}
+      {{- end }}
+      {{- with .Values.api.deployment.dnsConfig }}
+      dnsConfig:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.api.deployment.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.api.deployment.priorityClassName }}
+      priorityClassName: {{ .Values.api.deployment.priorityClassName }}
+      {{- end }}
+      {{- if .Values.api.deployment.restartPolicy }}
+      restartPolicy: {{ .Values.api.deployment.restartPolicy }}
+      {{- end }}
+      {{- with .Values.api.deployment.hostAliases }}
+      hostAliases:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+---
+{{- if .Values.pdf.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ (printf "%s-%s" (include "formio-enterprise-fullname" .) .Values.pdf.name) }}
+  labels:
+    {{- include "formio-enterprise-labels" . | nindent 4 }}
+    app.kubernetes.io/component: {{ .Values.pdf.name }}
+spec:
+  {{- if not .Values.pdf.deployment.autoscaling.enabled }}
+  replicas: {{ .Values.pdf.deployment.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "formio-enterprise-selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: {{ .Values.pdf.name }}
+  template:
+    metadata:
+      {{- with .Values.pdf.deployment.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "formio-enterprise-labels" . | nindent 8 }}
+        app.kubernetes.io/component: {{ .Values.pdf.name }}
+        {{- with .Values.pdf.deployment.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      serviceAccountName: {{ include "formio-enterprise-serviceAccountName" . }}
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.pdf.deployment.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ (printf "%s-%s" (include "formio-enterprise-fullname" .) .Values.pdf.name) }}
+          {{- with .Values.pdf.deployment.securityContext }}
+            securityContext:
+              {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{- if .Values.global.imageRegistry }}{{ trimSuffix "/" .Values.global.imageRegistry }}/{{ end }}{{ .Values.pdf.image.repository }}:{{ .Values.pdf.image.tag }}"
+          imagePullPolicy: {{ .Values.pdf.image.pullPolicy }}
+          env:
+            {{- if not .Values.secret.existingSecret }}
+            {{- include "formio-enterprise-fileStorageProviderEnv" . }}
+            {{- end }}
+            {{- if eq .Values.pdf.fileStorageProvider "minio" }}
+            - name: FORMIO_S3_PORT
+              value: {{ .Values.pdf.env.public.FORMIO_S3_PORT | default "9000" | quote }}
+            {{- end }}
+            {{- include "formio-enterprise.envVars" (dict "component" "pdf" "Values" .Values "Release" .Release) | nindent 12 }}
+            {{- $pdfExtraVars := (default list .Values.pdf.env.extraVars) }}
+            {{- $commonExtraVars := (default list .Values.common.env.extraVars) }}
+            {{- $allPdfExtraVars := concat $pdfExtraVars $commonExtraVars }}
+            {{- range $allPdfExtraVars }}
+            - name: {{ .name }}
+              value: {{ .value | quote }}
+            {{- end }}
+          ports:
+            - name: http
+              containerPort: 4005
+              protocol: TCP
+          {{- if .Values.pdf.deployment.startupProbe.enabled }}
+          {{- with .Values.pdf.deployment.startupProbe }}
+          startupProbe:
+            {{- include "formio-enterprise.probe" (dict "probe" . "defaultPort" 4005) | nindent 12 }}
+          {{- end }}
+          {{- end }}
+          {{- if .Values.pdf.deployment.livenessProbe.enabled }}
+          {{- with .Values.pdf.deployment.livenessProbe }}
+          livenessProbe:
+            {{- include "formio-enterprise.probe" (dict "probe" . "defaultPort" 4005) | nindent 12 }}
+          {{- end }}
+          {{- end }}
+          {{- if .Values.pdf.deployment.readinessProbe.enabled }}
+          {{- with .Values.pdf.deployment.readinessProbe }}
+          readinessProbe:
+            {{- include "formio-enterprise.probe" (dict "probe" . "defaultPort" 4005) | nindent 12 }}
+          {{- end }}
+          {{- end }}
+          {{- with .Values.pdf.deployment.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.api.deployment.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.pdf.deployment.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.pdf.deployment.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.pdf.deployment.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.pdf.deployment.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.pdf.deployment.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ .Values.pdf.deployment.terminationGracePeriodSeconds }}
+      {{- end }}
+      {{- with .Values.pdf.deployment.hostAliases }}
+      hostAliases:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.pdf.deployment.dnsPolicy }}
+      dnsPolicy: {{ .Values.pdf.deployment.dnsPolicy }}
+      {{- end }}
+      {{- with .Values.pdf.deployment.dnsConfig }}
+      dnsConfig:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.pdf.deployment.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.pdf.deployment.priorityClassName }}
+      priorityClassName: {{ .Values.pdf.deployment.priorityClassName }}
+      {{- end }}
+      {{- if .Values.pdf.deployment.restartPolicy }}
+      restartPolicy: {{ .Values.pdf.deployment.restartPolicy }}
+      {{- end }}
+      {{- with .Values.pdf.deployment.hostAliases }}
+      hostAliases:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

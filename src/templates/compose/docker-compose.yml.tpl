@@ -10,16 +10,18 @@ services:
       MONGO_INITDB_ROOT_USERNAME:
       MONGO_INITDB_ROOT_PASSWORD:
 <% if (package.pdf && !options.hosted) { %>
-  minio:
-    image: minio/minio
+  seaweedfs:
+    image: chrislusf/seaweedfs
     restart: always
+    ports:
+      - "8333:8333"
+      - "23646:23646"
     volumes:
-      - "./data/minio/data:/data"
-      - "./data/minio/config:/root/.minio"
+      - "./data/seaweedfs/data:/data"
     environment:
-      MINIO_ACCESS_KEY: CHANGEME
-      MINIO_SECRET_KEY: CHANGEME
-    command: server /data
+      AWS_ACCESS_KEY_ID: CHANGEME
+      AWS_SECRET_ACCESS_KEY: CHANGEME
+    command: server -s3
 <% } %>
 <% } %>
 <% if (package.server) { %>
@@ -98,7 +100,7 @@ services:
 <% if (package.local && !options.hosted) { %>
     links:
       - mongo
-      - minio
+      - seaweedfs
 <% } %>
 <% if (package.mongoCertName && !options.hosted) { %>
     volumes:
@@ -125,8 +127,8 @@ services:
       SSL_KEY: <%- package.sslKey %>
 <% } %>
 <% if (package.local && !options.hosted) { %>
-      FORMIO_S3_SERVER: minio
-      FORMIO_S3_PORT: 9000
+      FORMIO_S3_SERVER: seaweedfs
+      FORMIO_S3_PORT: 8333
       FORMIO_S3_BUCKET: formio
       FORMIO_S3_KEY: CHANGEME
       FORMIO_S3_SECRET: CHANGEME

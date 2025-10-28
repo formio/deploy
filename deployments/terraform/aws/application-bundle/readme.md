@@ -4,7 +4,7 @@ This is the application bundle the terraform script will zip and push to s3 duri
 * docker-compose.yml -- docker compose file that includes entries for 
     * api-server
     * pdf-server
-    * minio
+    * seaweedfs
     * nginx
 
 ## Environment Variables

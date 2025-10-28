@@ -73,9 +73,9 @@ Generate file storage provider environment variables using the same structure as
 {{- if not $fileStorageProvider }}
   {{- fail "A file storage provider (pdf.fileStorageProvider) must be configured for PDF functionality" }}
 {{- end }}
-{{- $allowedProviders := list "aws" "azure" "gcp" "minio" -}}
+{{- $allowedProviders := list "aws" "azure" "gcp" "seaweedfs" -}}
 {{- if not (has $fileStorageProvider $allowedProviders) }}
-  {{- fail (printf "Invalid file storage provider: %s. Allowed values are: aws, azure, gcp, minio" $fileStorageProvider) }}
+  {{- fail (printf "Invalid file storage provider: %s. Allowed values are: aws, azure, gcp, seaweedfs" $fileStorageProvider) }}
 {{- end }}
 
 {{- /* Get pdf environment variables */ -}}
@@ -83,17 +83,17 @@ Generate file storage provider environment variables using the same structure as
 {{- $providerPublic := .Values.pdf.env | default dict }}
 
 {{- if ne $fileStorageProvider "azure" }}
-  {{- /* S3-compatible storage (AWS, GCP, Minio) */ -}}
+  {{- /* S3-compatible storage (AWS, GCP, SeaweedFS) */ -}}
   {{- if not $providerPublic.formioS3Bucket }}
-    {{- fail "Environment variable formioS3Bucket is required for aws, gcp and minio storage" }}
+    {{- fail "Environment variable formioS3Bucket is required for aws, gcp and seaweedfs storage" }}
   {{- end }}
 
   {{- if not $providerSecrets.formioS3Key }}
-    {{- fail "Environment variable formioS3Key is required when using aws, gcp or minio storage" }}
+    {{- fail "Environment variable formioS3Key is required when using aws, gcp or seaweedfs storage" }}
   {{- end }}
 
   {{- if not $providerSecrets.formioS3Secret }}
-    {{- fail "Environment variable formioS3Secret is required when using aws, gcp or minio storage" }}
+    {{- fail "Environment variable formioS3Secret is required when using aws, gcp or seaweedfs storage" }}
   {{- end }}
 
   {{- if eq $fileStorageProvider "aws" }}
@@ -102,7 +102,7 @@ Generate file storage provider environment variables using the same structure as
     {{- end }}
   {{- else }}
     {{- if not $providerPublic.formioS3Server }}
-      {{- fail "Environment variable formioS3Server is required when using gcp or minio storage" }}
+      {{- fail "Environment variable formioS3Server is required when using gcp or seaweedfs storage" }}
     {{- end }}
   {{- end }}
 {{- else }}

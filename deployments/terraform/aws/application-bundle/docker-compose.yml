@@ -1,15 +1,17 @@
 version: "3.8"
 services:
-  minio:
-    image: minio/minio
+  seaweedfs:
+    image: chrislusf/seaweedfs
     restart: always
+    ports:
+      - "8333:8333"
+      - "23646:23646"
     volumes:
-      - "./data/minio/data:/data"
-      - "./data/minio/config:/root/.minio"
+      - "./data/seaweedfs/data:/data"
     environment:
-      MINIO_ACCESS_KEY: CHANGEME
-      MINIO_SECRET_KEY: CHANGEME
-    command: server /data
+      AWS_ACCESS_KEY_ID: CHANGEME
+      AWS_SECRET_ACCESS_KEY: CHANGEME
+    command: server -s3
   api-server:
     image: formio/formio-enterprise:latest
     mem_limit: 2048m
@@ -28,7 +30,7 @@ services:
     restart: always
     mem_limit: 2048m
     links:
-      - minio
+      - seaweedfs
     ports:
       - "4005:4005"
     env_file:

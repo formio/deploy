@@ -137,9 +137,9 @@ To modify the API or PDF server versions, specify different versions of the imag
 
 ## **PDF Server File Storage Configurations**
 
-If your deployment contains a PDF server, here are some file storage configuration options depending on your deployment environment/cloud provider. To specify the storage solution being used, set `pdf.fileStorageProvider` to `“aws”`, `"azure"`, `"gcp"`, or `"minio"`. S3-named variables refer to any S3-compatible storage solution. Here are links to general documentation on file storage configuration in [Form.io](http://Form.io):
+If your deployment contains a PDF server, here are some file storage configuration options depending on your deployment environment/cloud provider. To specify the storage solution being used, set `pdf.fileStorageProvider` to `“aws”`, `"azure"`, `"gcp"`, or `"seaweedfs"`. S3-named variables refer to any S3-compatible storage solution. Here are links to general documentation on file storage configuration in [Form.io](http://Form.io):
 
-- [AWS, Azure, Minio](https://help.form.io/deployments/deployment-guide/pdf-server#file-storage-environment-variables)
+- [AWS, Azure, SeaweedFS](https://help.form.io/deployments/deployment-guide/pdf-server#file-storage-environment-variables)
 - [GCP](https://help.form.io/deployments/deployment-guide/cloud-deployment/gcp-deployment/gcp-cloud-run#pdf-server-deployment) (scroll to section on PDF server environment variables)
 
 ### **AWS S3**
@@ -197,7 +197,7 @@ pdf:
   ...
 ```
 
-### Minio
+### SeaweedFS
 
 ```yaml
 secret:
@@ -209,11 +209,11 @@ secret:
   ...
 
 pdf:
-  fileStorageProvider: minio
+  fileStorageProvider: seaweedfs
   env:
 	  formioS3Bucket: demo-bucket
-	  formioS3Server: https://yourminioserverurl.com
-	  formioS3Port: 9000
+	  formioS3Server: https://yourseaweedfsserverurl.com
+	  formioS3Port: 8333
   ...
 ```
 

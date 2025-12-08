@@ -3,6 +3,7 @@
 deployments/current
 node_modules
 .env
+.idea
 
 # Local .terraform directories
 **/.terraform/*

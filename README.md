@@ -1,6 +1,12 @@
 # Disclaimer -- Use at your own risk
 These deployment scripts are meant as examples of how to deploy the Formio servers into your environment. They should be carefully reviewed and modified accordingly to ensure they meet any specific deployment and/or security requirements
 
+Official Documentation
+--------------------------
+For the latest documentation, release information, and guides, always refer to the official Form.io Help Documentation available here:
+
+**[https://help.form.io](https://help.form.io/deploy)**
+
 # Deployment strategies for Form.io Enterprise platform
 This repo contains all of the deployment strategies for the Form.io Enterprise Platform. These deployments contain the following strategies.
 

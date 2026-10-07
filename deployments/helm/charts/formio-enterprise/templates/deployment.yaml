@@ -45,6 +45,8 @@ spec:
           imagePullPolicy: {{ .Values.api.image.pullPolicy }}
           env:
             {{- include "formio-enterprise.envVars" (dict "component" "api" "Values" .Values "Release" .Release) | nindent 12 }}
+            - name: PORT
+              value: "3000"
             {{- if .Values.pdf.enabled }}
             - name: PDF_SERVER
               value: {{ .Values.api.env.pdfServer | default (printf "http://%s-%s.%s.svc.cluster.local:%d" (include "formio-enterprise-fullname" .) .Values.pdf.name .Release.Namespace (.Values.pdf.service.port | default 80 | int)) }}
@@ -58,24 +60,24 @@ spec:
             {{- end }}
           ports:
             - name: http
-              containerPort: {{ .Values.api.env.PORT | default 80 }}
+              containerPort: 3000
               protocol: TCP
           {{- if .Values.api.deployment.livenessProbe.enabled }}
           {{- with .Values.api.deployment.livenessProbe }}
           livenessProbe:
-            {{- include "formio-enterprise.probe" (dict "probe" . "defaultPort" 80) | nindent 12 }}
+            {{- include "formio-enterprise.probe" (dict "probe" . "defaultPort" "http") | nindent 12 }}
           {{- end }}
           {{- end }}
           {{- if .Values.api.deployment.readinessProbe.enabled }}
           {{- with .Values.api.deployment.readinessProbe }}
           readinessProbe:
-            {{- include "formio-enterprise.probe" (dict "probe" . "defaultPort" 80) | nindent 12 }}
+            {{- include "formio-enterprise.probe" (dict "probe" . "defaultPort" "http") | nindent 12 }}
           {{- end }}
           {{- end }}
           {{- if .Values.api.deployment.startupProbe.enabled }}
           {{- with .Values.api.deployment.startupProbe }}
           startupProbe:
-            {{- include "formio-enterprise.probe" (dict "probe" . "defaultPort" 80) | nindent 12 }}
+            {{- include "formio-enterprise.probe" (dict "probe" . "defaultPort" "http") | nindent 12 }}
           {{- end }}
           {{- end }}
           {{- with .Values.api.deployment.resources }}
@@ -186,6 +188,8 @@ spec:
               value: {{ .Values.pdf.env.public.FORMIO_S3_PORT | default "8333" | quote }}
             {{- end }}
             {{- include "formio-enterprise.envVars" (dict "component" "pdf" "Values" .Values "Release" .Release) | nindent 12 }}
+            - name: FORMIO_PDF_PORT
+              value: "4005"
             {{- $pdfExtraVars := (default list .Values.pdf.env.extraVars) }}
             {{- $commonExtraVars := (default list .Values.common.env.extraVars) }}
             {{- $allPdfExtraVars := concat $pdfExtraVars $commonExtraVars }}
@@ -200,19 +204,19 @@ spec:
           {{- if .Values.pdf.deployment.startupProbe.enabled }}
           {{- with .Values.pdf.deployment.startupProbe }}
           startupProbe:
-            {{- include "formio-enterprise.probe" (dict "probe" . "defaultPort" 4005) | nindent 12 }}
+            {{- include "formio-enterprise.probe" (dict "probe" . "defaultPort" "http") | nindent 12 }}
           {{- end }}
           {{- end }}
           {{- if .Values.pdf.deployment.livenessProbe.enabled }}
           {{- with .Values.pdf.deployment.livenessProbe }}
           livenessProbe:
-            {{- include "formio-enterprise.probe" (dict "probe" . "defaultPort" 4005) | nindent 12 }}
+            {{- include "formio-enterprise.probe" (dict "probe" . "defaultPort" "http") | nindent 12 }}
           {{- end }}
           {{- end }}
           {{- if .Values.pdf.deployment.readinessProbe.enabled }}
           {{- with .Values.pdf.deployment.readinessProbe }}
           readinessProbe:
-            {{- include "formio-enterprise.probe" (dict "probe" . "defaultPort" 4005) | nindent 12 }}
+            {{- include "formio-enterprise.probe" (dict "probe" . "defaultPort" "http") | nindent 12 }}
           {{- end }}
           {{- end }}
           {{- with .Values.pdf.deployment.resources }}

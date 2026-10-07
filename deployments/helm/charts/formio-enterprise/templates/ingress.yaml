@@ -32,7 +32,7 @@ spec:
             service:
               name: {{ (printf "%s-%s" (include "formio-enterprise-fullname" $) ($.Values.api.name | required "api.name is required")) }}
               port:
-                number: {{ $.Values.api.service.port | default 80 }}
+                name: http
     {{- end }}
 {{- end }}
 ---
@@ -70,6 +70,6 @@ spec:
             service:
               name: {{ (printf "%s-%s" (include "formio-enterprise-fullname" $) ($.Values.pdf.name | required "pdf.name is required")) }}
               port:
-                number: {{ $.Values.pdf.service.port | default 80 }}
+                name: http
     {{- end }}
 {{- end }}

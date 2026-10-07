@@ -46,7 +46,7 @@ spec:
   publishNotReadyAddresses: {{ .Values.api.service.publishNotReadyAddresses }}
   ports:
     - port: {{ .Values.api.service.port | default 80 }}
-      targetPort: 80
+      targetPort: http
       protocol: TCP
       name: http
   selector:
@@ -102,7 +102,7 @@ spec:
   publishNotReadyAddresses: {{ .Values.pdf.service.publishNotReadyAddresses }}
   ports:
     - port: {{ .Values.pdf.service.port | default 80 }}
-      targetPort: 4005
+      targetPort: http
       protocol: TCP
       name: http
   selector:

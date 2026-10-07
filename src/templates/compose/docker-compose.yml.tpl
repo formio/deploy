@@ -47,7 +47,7 @@ services:
       - "3000:3000"
 <% } else if (!package.nginx) { %>
     ports:
-      - "<%- options.port %>:80"
+      - "<%- options.port %>:3000"
 <% } %>
     environment:
 <% if (package.local) { %>
@@ -79,11 +79,7 @@ services:
 <% if (package.portal && options.portal) { %>
       PORTAL_ENABLED: 1
 <% } %>
-<% if (package.nginx) { %>
       PORT: 3000
-<% } else { %>
-      PORT: 80
-<% } %>
 <% if (package.local) { %>
     env_file:
       - data/.env
@@ -111,7 +107,7 @@ services:
       - "4005:4005"
 <% } else if (!package.nginx) { %>
     ports:
-      - "<%- options.port %>:80"
+      - "<%- options.port %>:4005"
 <% } %>
     environment:
 <% if (package.mongo && !options.hosted) { %>
@@ -133,11 +129,7 @@ services:
       FORMIO_S3_KEY: CHANGEME
       FORMIO_S3_SECRET: CHANGEME
 <% } %>
-<% if (package.nginx) { %>
       FORMIO_PDF_PORT: 4005
-<% } else { %>
-      FORMIO_PDF_PORT: 80
-<% } %>
 <% if (package.local) { %>
     env_file:
       - data/.env

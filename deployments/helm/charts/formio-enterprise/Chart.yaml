@@ -4,6 +4,6 @@ description: A Helm chart for Form.io Enterprise
 
 type: application
 
-version: 1.0.0
+version: 1.1.0
 
 appVersion: "9.5.0_5.10.15"

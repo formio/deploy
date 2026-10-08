@@ -249,7 +249,6 @@ api:
     debug: formio.*
   service:
     type: LoadBalancer
-    port: 80
   ingress:
     enabled: true
     className: ""

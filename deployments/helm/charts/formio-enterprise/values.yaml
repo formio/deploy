@@ -124,7 +124,6 @@ api:
     sessionAffinityConfig: {}
     externalTrafficPolicy: Cluster
     publishNotReadyAddresses: false
-    port: 80
     annotations: {}
   ingress:
     enabled: true
@@ -229,7 +228,6 @@ pdf:
     sessionAffinity: None
     sessionAffinityConfig: {}
     publishNotReadyAddresses: false
-    port: 80
     annotations: {}
   ingress:
     enabled: false

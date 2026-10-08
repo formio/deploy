@@ -183,9 +183,9 @@ spec:
             {{- if not .Values.secret.existingSecret }}
             {{- include "formio-enterprise-fileStorageProviderEnv" . }}
             {{- end }}
-            {{- if eq .Values.pdf.fileStorageProvider "seaweedfs" }}
+            {{- if and (eq .Values.pdf.fileStorageProvider "seaweedfs") (not .Values.pdf.env.formioS3Port) }}
             - name: FORMIO_S3_PORT
-              value: {{ .Values.pdf.env.public.FORMIO_S3_PORT | default "8333" | quote }}
+              value: "8333"
             {{- end }}
             {{- include "formio-enterprise.envVars" (dict "component" "pdf" "Values" .Values "Release" .Release) | nindent 12 }}
             - name: FORMIO_PDF_PORT

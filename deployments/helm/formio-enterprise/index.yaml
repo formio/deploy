@@ -3,22 +3,22 @@ entries:
   formio-enterprise:
   - apiVersion: v2
     appVersion: 9.5.0_5.10.15
-    created: "2026-10-07T11:45:16.245416774-05:00"
+    created: "2026-10-08T17:16:44.759373-05:00"
     description: A Helm chart for Form.io Enterprise
-    digest: 647ff2a95109abd3ad58c98fd2110ae8af4cfd74388b05104f9a2c0bf5aad4c3
+    digest: 0454b45400ae89bc4ebc4927f3fdbe24ca9642b53ea97991a83d365ff69315e0
     name: formio-enterprise
     type: application
     urls:
-    - https://formio.github.io/deploy/deployments/helm/formio-enterprise/formio-enterprise-1.1.0.tgz
+    - https://raw.githubusercontent.com/formio/deploy/main/deployments/helm/formio-enterprise/formio-enterprise-1.1.0.tgz
     version: 1.1.0
   - apiVersion: v2
     appVersion: 9.5.0_5.10.15
-    created: "2026-10-07T11:45:16.244590401-05:00"
+    created: "2026-10-08T17:16:44.758894-05:00"
     description: A Helm chart for Form.io Enterprise
     digest: 53f80a352e8f007aa8bb7c0f5c48de2346d7086434ab08028a42f53f194e5044
     name: formio-enterprise
     type: application
     urls:
-    - https://formio.github.io/deploy/deployments/helm/formio-enterprise/formio-enterprise-1.0.0.tgz
+    - https://raw.githubusercontent.com/formio/deploy/main/deployments/helm/formio-enterprise/formio-enterprise-1.0.0.tgz
     version: 1.0.0
-generated: "2026-10-07T11:45:16.243678321-05:00"
+generated: "2026-10-08T17:16:44.757673-05:00"
